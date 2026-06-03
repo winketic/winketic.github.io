@@ -147,7 +147,11 @@
   .footer-links{display:flex;gap:2rem;list-style:none}
   .footer-links a{color:var(--muted);font-family:'Space Mono',monospace;font-size:0.75rem;text-decoration:none;letter-spacing:0.1em;transition:color 0.2s}
   .footer-links a:hover{color:var(--text)}
-  .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--border);padding-top:1.5rem}
+  .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;border-top:1px solid var(--border);padding-top:1.5rem}
+  .footer-hub{display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;flex-shrink:0}
+  .hub-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+  .hub-logo{height:28px;width:auto;opacity:0.7;filter:brightness(0) invert(1);transition:opacity 0.2s}
+  .hub-logo:hover{opacity:1}
   .footer-copy{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.05em}
   .footer-rights{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);opacity:0.7;max-width:500px;line-height:1.6}
 
@@ -181,6 +185,7 @@
     .footer-top{flex-direction:column;text-align:center}
     .footer-links{justify-content:center}
     .footer-bottom{flex-direction:column;text-align:center}
+    .footer-hub{align-items:center}
     hr.divider{margin:0 1.5rem}
   }
   @media(max-width:600px){
@@ -449,9 +454,15 @@
     </ul>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2026 Altai Dynamics. Все права защищены. Астана, Казахстан.</div>
-    <div class="footer-rights">
-      AD Pulse и Altai Dynamics являются зарегистрированными товарными знаками. Платформа, дизайн, исходный код и все материалы защищены авторским правом. Несанкционированное копирование и использование запрещено.
+    <div>
+      <div class="footer-copy">© 2026 Altai Dynamics. Все права защищены. Астана, Казахстан.</div>
+      <div class="footer-rights" style="margin-top:0.5rem">
+        AD Pulse и Altai Dynamics являются зарегистрированными товарными знаками. Платформа, дизайн, исходный код и все материалы защищены авторским правом. Несанкционированное копирование и использование запрещено.
+      </div>
+    </div>
+    <div class="footer-hub">
+      <div class="hub-label">Резидент</div>
+      <img src="https://cdn.astanahub.com/static/img_v2/logo.svg" alt="Astana Hub" class="hub-logo">
     </div>
   </div>
 </footer>
