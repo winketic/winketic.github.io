@@ -21,8 +21,8 @@
   body{background:var(--c1);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
 
   /* CURSOR */
-  .cursor{position:fixed;width:12px;height:12px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s,background 0.2s;transform:translate(-50%,-50%)}
-  .cursor-trail{position:fixed;width:40px;height:40px;border:1px solid rgba(0,245,196,0.3);border-radius:50%;pointer-events:none;z-index:9998;transition:transform 0.15s ease,left 0.12s ease,top 0.12s ease;transform:translate(-50%,-50%)}
+  .cursor{position:fixed;width:12px;height:12px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s,background 0.2s;transform:translate(-50%,-50%);opacity:0}
+  .cursor-trail{position:fixed;width:40px;height:40px;border:1px solid rgba(0,245,196,0.3);border-radius:50%;pointer-events:none;z-index:9998;transition:transform 0.15s ease;transform:translate(-50%,-50%);opacity:0}
 
   /* BG */
   #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
@@ -49,13 +49,14 @@
   .hero-eyebrow{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
   .hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--accent)}
   .hero-title{font-family:'Syne',sans-serif;font-size:clamp(3.5rem,9vw,9rem);font-weight:800;line-height:0.9;letter-spacing:-0.03em;margin-bottom:2rem}
-  .hero-title .line{display:block;overflow:hidden}
+  .hero-title .line{display:block;overflow:visible}
+  .hero-title .line:last-child{display:flex;align-items:baseline;gap:0;overflow:hidden}
   .hero-title .line span{display:block;transform:translateY(110%);animation:slideUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
   .hero-title .line:nth-child(1) span{animation-delay:0.1s}
   .hero-title .line:nth-child(2) span{animation-delay:0.2s}
   .hero-title .line:nth-child(3) span{animation-delay:0.3s}
   .hero-title .accent{color:var(--accent)}
-  .hero-title .stroke{-webkit-text-stroke:1px rgba(255,255,255,0.3);color:transparent}
+  .hero-title .stroke{-webkit-text-stroke:1px rgba(255,255,255,0.3);color:transparent;white-space:nowrap}
   @keyframes slideUp{to{transform:translateY(0)}}
   .hero-sub{max-width:500px;font-size:1.05rem;line-height:1.7;color:var(--muted);margin-bottom:3rem;opacity:0;animation:fadeIn 1s 0.6s forwards}
   @keyframes fadeIn{to{opacity:1}}
@@ -86,7 +87,7 @@
   .section-desc{max-width:600px;color:var(--muted);font-size:1rem;line-height:1.8;margin-bottom:3rem}
 
   /* FEATURES GRID — rich hover */
-  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;border:1px solid var(--border);background:var(--border)}
+  .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--border);background:var(--border)}
   .feature-card{
     background:var(--c2);padding:2.5rem;
     position:relative;overflow:hidden;
@@ -188,8 +189,11 @@
     .footer-hub{align-items:center}
     hr.divider{margin:0 1.5rem}
   }
+  @media(max-width:900px){
+    .features-grid{grid-template-columns:repeat(2,1fr)}
+  }
   @media(max-width:600px){
-    .features-grid{background:transparent;border:none;gap:1rem}
+    .features-grid{grid-template-columns:1fr;background:transparent;border:none;gap:1rem}
     .feature-card{border:1px solid var(--border)}
   }
 
@@ -221,6 +225,47 @@
   .wa-float svg{width:28px;height:28px;fill:#fff}
   @keyframes waFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 
+  /* FOR WHOM */
+  .fw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:3rem}
+  .fw-card{border:1px solid var(--border);padding:2rem;background:var(--c2);position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+  .fw-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform 0.4s}
+  .fw-card:hover{border-color:rgba(0,245,196,0.3);transform:translateY(-4px)}
+  .fw-card:hover::before{transform:scaleX(1)}
+  .fw-icon{font-size:2rem;margin-bottom:1rem}
+  .fw-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem}
+  .fw-desc{color:var(--muted);font-size:0.85rem;line-height:1.6;margin-bottom:1rem}
+  .fw-tag{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);letter-spacing:0.1em;border:1px solid rgba(0,245,196,0.2);display:inline-block;padding:0.25rem 0.6rem;background:rgba(0,245,196,0.04)}
+  @media(max-width:900px){.fw-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.fw-grid{grid-template-columns:1fr}}
+
+  /* VIDEO BUTTON */
+  .video-btn{display:inline-flex;align-items:center;gap:1.2rem;background:var(--c2);border:1px solid var(--border);padding:1.2rem 2.5rem;cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text)}
+  .video-btn:hover{border-color:rgba(0,245,196,0.4);background:rgba(0,245,196,0.04)}
+  .video-play{width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--c1);flex-shrink:0;transition:transform 0.3s}
+  .video-btn:hover .video-play{transform:scale(1.1)}
+  .video-dur{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);margin-left:0.5rem}
+
+  /* VIDEO MODAL */
+  .vmodal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(10px)}
+  .vmodal.open{display:flex}
+  .vmodal-inner{position:relative;width:100%;max-width:800px;background:var(--c2);border:1px solid var(--border)}
+  .vmodal-close{position:absolute;top:-2.5rem;right:0;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:none;font-family:'Space Mono',monospace;opacity:0.6;transition:opacity 0.2s}
+  .vmodal-close:hover{opacity:1}
+  .vmodal-screen{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:var(--c1);position:relative;overflow:hidden}
+  .vmodal-placeholder{text-align:center;padding:2rem;position:relative;z-index:1}
+  .vmodal-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;background:rgba(0,245,196,0.03);animation:vpulse 3s ease-in-out infinite}
+  @keyframes vpulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
+
+  /* FAQ */
+  .faq-list{max-width:760px;display:flex;flex-direction:column;gap:0;margin-top:2rem}
+  .faq-item{border-bottom:1px solid var(--border)}
+  .faq-q{width:100%;background:none;border:none;padding:1.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:none;text-align:left;font-family:'Syne',sans-serif;font-size:1rem;font-weight:600;color:var(--text);transition:color 0.2s}
+  .faq-q:hover{color:var(--accent)}
+  .faq-arrow{font-size:1.5rem;font-weight:300;color:var(--accent);flex-shrink:0;transition:transform 0.3s;font-family:monospace;line-height:1}
+  .faq-item.open .faq-arrow{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s;font-size:0.95rem;line-height:1.7;color:var(--muted);padding:0}
+  .faq-item.open .faq-a{max-height:200px;padding-bottom:1.5rem}
+
   /* HIDE CURSOR ON TOUCH */
   @media(hover:none),(pointer:coarse){body{cursor:auto}.cursor,.cursor-trail{display:none!important}}
 </style>
@@ -240,9 +285,10 @@
   <a href="#" class="nav-logo" id="nav-logo" data-text="ADPulse">AD<span>Pulse</span></a>
   <ul class="nav-links">
     <li><a href="#features">Возможности</a></li>
-    <li><a href="#how">Как работает</a></li>
-    <li><a href="#integrations">Интеграции</a></li>
-    <li><a href="#contact">Контакт</a></li>
+    <li><a href="#forwhom">Для кого</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="about.html">О нас</a></li>
+    <li><a href="contact.html">Контакт</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Демо</a>
   <div class="burger" id="burger" onclick="toggleMenu()">
@@ -452,6 +498,115 @@
 
 <hr class="divider">
 
+<!-- FOR WHOM -->
+<section id="forwhom">
+  <div class="section-label">Для кого</div>
+  <h2 class="section-title reveal">Создан для<br><span style="color:var(--accent)">производственников</span></h2>
+  <p class="section-desc reveal">AD Pulse понимает специфику реального сектора — сезонность, партии, сложные цепочки поставок.</p>
+  <div class="fw-grid">
+    <div class="fw-card reveal">
+      <div class="fw-icon">🏗️</div>
+      <div class="fw-title">Производители стройматериалов</div>
+      <p class="fw-desc">Цемент, ЖБИ, кирпич, блоки. Контроль партий, отгрузок, дебиторки через WhatsApp.</p>
+      <div class="fw-tag">Бетон · Цемент · ЖБИ</div>
+    </div>
+    <div class="fw-card reveal">
+      <div class="fw-icon">⚙️</div>
+      <div class="fw-title">Металлоторговля</div>
+      <p class="fw-desc">Арматура, трубы, профиль. Учёт тоннажа, резка, остатки на складе в реальном времени.</p>
+      <div class="fw-tag">Металл · Прокат · Трубы</div>
+    </div>
+    <div class="fw-card reveal">
+      <div class="fw-icon">🚛</div>
+      <div class="fw-title">Дистрибьюторы</div>
+      <p class="fw-desc">Многоуровневые цепочки, несколько складов, десятки поставщиков — всё в одном окне.</p>
+      <div class="fw-tag">Опт · Логистика · B2B</div>
+    </div>
+    <div class="fw-card reveal">
+      <div class="fw-icon">🪵</div>
+      <div class="fw-title">Лесная промышленность</div>
+      <p class="fw-desc">Пиломатериалы, доска, брус. Учёт кубатуры, влажности, сортности прямо в системе.</p>
+      <div class="fw-tag">Лес · Пиломатериалы</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- VIDEO DEMO -->
+<section style="text-align:center;padding:5rem 4rem">
+  <div class="section-label" style="justify-content:center">Демо</div>
+  <h2 class="section-title reveal" style="max-width:600px;margin:0 auto 1.5rem">Посмотри как<br>работает AD Pulse</h2>
+  <p class="section-desc reveal" style="margin:0 auto 2.5rem">3-минутный тур по платформе. Без регистрации.</p>
+  <button class="video-btn reveal" onclick="openVideo()">
+    <span class="video-play">▶</span>
+    <span>Смотреть демо</span>
+    <span class="video-dur">3:24</span>
+  </button>
+</section>
+
+<!-- VIDEO MODAL -->
+<div class="vmodal" id="vmodal" onclick="closeVideo()">
+  <div class="vmodal-inner" onclick="event.stopPropagation()">
+    <button class="vmodal-close" onclick="closeVideo()">✕</button>
+    <div class="vmodal-screen">
+      <div class="vmodal-placeholder">
+        <div class="vmodal-pulse"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:0.5rem">AD Pulse Demo</div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted)">Видео скоро появится · Coming soon</div>
+        <a href="https://wa.me/77071115354" class="btn-primary" style="margin-top:2rem;display:inline-block">Получить живое демо →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title reveal">Частые вопросы</h2>
+  <div class="faq-list">
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span>Нужны ли технические знания для подключения?</span>
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Нет. Подключение WhatsApp — это сканирование QR-кода. Остальные настройки делаются через визуальный интерфейс. Если возникнут вопросы — мы помогаем лично.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span>Как хранятся данные? Это безопасно?</span>
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Данные хранятся на серверах в Казахстане, зашифрованы AES-256. Доступ по ролям, 2FA аутентификация, полный аудит действий. Возможно On-premise развёртывание на ваших серверах.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span>Можно ли работать с нескольких компаний?</span>
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Да. Мультитенантная архитектура позволяет управлять несколькими юридическими лицами из одного аккаунта с полной изоляцией данных между ними.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span>Есть ли интеграция с 1С?</span>
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Да, полная двусторонняя синхронизация с 1С:Бухгалтерия и 1С:Торговля. Данные синхронизируются автоматически по расписанию или в реальном времени.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span>Сколько стоит? Есть ли бесплатный период?</span>
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Стоимость рассчитывается индивидуально под задачи вашего бизнеса. Пишите нам в WhatsApp — покажем демо и обсудим условия. Первые 14 дней бесплатно.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
 <!-- CTA -->
 <section class="cta-section" id="contact">
   <div class="cta-bg"></div>
@@ -462,7 +617,7 @@
   </p>
   <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1" class="reveal">
     <a href="https://wa.me/77071115354" class="btn-primary" style="font-size:1rem">Написать в WhatsApp →</a>
-    <a href="mailto:hello@altaidynamics.kz" class="btn-ghost" style="border:1px solid var(--border);padding:1rem 2rem;font-size:0.85rem">Email нам</a>
+    <a href="contact.html" class="btn-ghost" style="border:1px solid var(--border);padding:1rem 2rem;font-size:0.85rem">Форма заявки</a>
   </div>
 </section>
 
@@ -504,8 +659,17 @@ const cursor=document.getElementById('cursor');
 const trail=document.getElementById('cursor-trail');
 let mx=window.innerWidth/2,my=window.innerHeight/2,tx=mx,ty=my;
 if(!isTouch){
-  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
-  (function animTrail(){tx+=(mx-tx)*0.25;ty+=(my-ty)*0.25;trail.style.left=tx+'px';trail.style.top=ty+'px';requestAnimationFrame(animTrail)})();
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    cursor.style.left=mx+'px';cursor.style.top=my+'px';
+    cursor.style.opacity='1';trail.style.opacity='1';
+  });
+  (function animTrail(){
+    tx+=(mx-tx)*0.25;ty+=(my-ty)*0.25;
+    trail.style.left=Math.round(tx)+'px';
+    trail.style.top=Math.round(ty)+'px';
+    requestAnimationFrame(animTrail);
+  })();
   document.querySelectorAll('a,button,.feature-card,.step,.int-chip,.wa-float').forEach(el=>{
     el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2)';cursor.style.background='#7b5ea7'});
     el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';cursor.style.background='var(--accent)'});
@@ -576,11 +740,23 @@ window.addEventListener('scroll',()=>{
 // MOBILE MENU
 function toggleMenu(){document.getElementById('mobile-nav').classList.toggle('open')}
 
+// FAQ
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item');
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+
+// VIDEO MODAL
+function openVideo(){document.getElementById('vmodal').classList.add('open');document.body.style.overflow='hidden'}
+function closeVideo(){document.getElementById('vmodal').classList.remove('open');document.body.style.overflow=''}
+
 // TYPED EFFECT
 (function(){
   const el=document.getElementById('typed-target');
   if(!el)return;
-  const words=['умнее','быстрее','выгоднее','точнее'];
+  const words=['умнее','быстрее','точнее','проще'];
   let wi=0,ci=0,deleting=false;
   function type(){
     const word=words[wi];
