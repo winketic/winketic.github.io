@@ -200,6 +200,29 @@
   .mobile-nav a:hover{color:var(--accent)}
   .mobile-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--text);font-size:2rem;cursor:none}
   .count-up{display:inline-block}
+
+  /* GLITCH LOGO */
+  .nav-logo{position:relative}
+  .nav-logo::before,.nav-logo::after{content:attr(data-text);position:absolute;top:0;left:0;font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:0.1em;opacity:0;pointer-events:none}
+  .nav-logo::before{color:#ff4d6d}
+  .nav-logo::after{color:#00f5c4}
+  .nav-logo.glitching::before{opacity:0.8;animation:glitch1 0.35s steps(3) forwards}
+  .nav-logo.glitching::after{opacity:0.8;animation:glitch2 0.35s steps(3) forwards}
+  @keyframes glitch1{0%{clip-path:inset(20% 0 60% 0);transform:translate(-4px,0)}33%{clip-path:inset(60% 0 10% 0);transform:translate(4px,0)}66%{clip-path:inset(40% 0 30% 0);transform:translate(-2px,0)}100%{clip-path:inset(0 0 100% 0);transform:translate(0)}}
+  @keyframes glitch2{0%{clip-path:inset(50% 0 20% 0);transform:translate(4px,0)}33%{clip-path:inset(10% 0 70% 0);transform:translate(-4px,0)}66%{clip-path:inset(70% 0 5% 0);transform:translate(2px,0)}100%{clip-path:inset(0 0 100% 0);transform:translate(0)}}
+
+  /* TYPED CURSOR BLINK */
+  .typed-cursor{display:inline-block;width:3px;height:0.8em;background:var(--accent);margin-left:4px;vertical-align:middle;animation:tblink 0.7s step-end infinite}
+  @keyframes tblink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* FLOATING WHATSAPP */
+  .wa-float{position:fixed;bottom:2rem;right:2rem;z-index:500;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform 0.3s,box-shadow 0.3s;animation:waFloat 3s ease-in-out infinite}
+  .wa-float:hover{transform:scale(1.12)!important;box-shadow:0 6px 30px rgba(37,211,102,0.65);animation:none}
+  .wa-float svg{width:28px;height:28px;fill:#fff}
+  @keyframes waFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+  /* HIDE CURSOR ON TOUCH */
+  @media(hover:none),(pointer:coarse){body{cursor:auto}.cursor,.cursor-trail{display:none!important}}
 </style>
 </head>
 <body>
@@ -214,7 +237,7 @@
 
 <!-- NAV -->
 <nav id="navbar">
-  <a href="#" class="nav-logo">AD<span>Pulse</span></a>
+  <a href="#" class="nav-logo" id="nav-logo" data-text="ADPulse">AD<span>Pulse</span></a>
   <ul class="nav-links">
     <li><a href="#features">Возможности</a></li>
     <li><a href="#how">Как работает</a></li>
@@ -243,7 +266,7 @@
   <h1 class="hero-title">
     <div class="line"><span>Управляй</span></div>
     <div class="line"><span class="accent">бизнесом</span></div>
-    <div class="line"><span class="stroke">умнее</span></div>
+    <div class="line"><span class="stroke" id="typed-target"></span><span class="typed-cursor"></span></div>
   </h1>
   <p class="hero-sub">
     AD Pulse — B2B платформа нового поколения для управления материалами,
@@ -467,20 +490,29 @@
   </div>
 </footer>
 
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/77071115354" class="wa-float" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
 <script>
-// CURSOR
+// DETECT TOUCH — no cursor on mobile
+const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+
+// CURSOR (desktop only)
 const cursor=document.getElementById('cursor');
 const trail=document.getElementById('cursor-trail');
-let mx=0,my=0,tx=0,ty=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
-function animTrail(){tx+=(mx-tx)*0.15;ty+=(my-ty)*0.15;trail.style.left=tx+'px';trail.style.top=ty+'px';requestAnimationFrame(animTrail)}
-animTrail();
-document.querySelectorAll('a,button,.feature-card,.step,.int-chip').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2)';cursor.style.background='#7b5ea7'});
-  el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';cursor.style.background='var(--accent)'});
-});
+let mx=window.innerWidth/2,my=window.innerHeight/2,tx=mx,ty=my;
+if(!isTouch){
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
+  (function animTrail(){tx+=(mx-tx)*0.25;ty+=(my-ty)*0.25;trail.style.left=tx+'px';trail.style.top=ty+'px';requestAnimationFrame(animTrail)})();
+  document.querySelectorAll('a,button,.feature-card,.step,.int-chip,.wa-float').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2)';cursor.style.background='#7b5ea7'});
+    el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';cursor.style.background='var(--accent)'});
+  });
+}
 
-// CANVAS PARTICLES
+// CANVAS PARTICLES — mouse repel
 const canvas=document.getElementById('bg-canvas');
 const ctx=canvas.getContext('2d');
 let W,H,particles=[];
@@ -488,16 +520,35 @@ function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerH
 resize();window.addEventListener('resize',resize);
 class Particle{
   constructor(){this.reset()}
-  reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-0.5)*0.3;this.vy=(Math.random()-0.5)*0.3;this.size=Math.random()*1.5+0.5;this.opacity=Math.random()*0.4+0.05;this.color=Math.random()>0.7?'0,245,196':'123,94,167'}
-  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.ox=this.x;this.oy=this.y;
+    this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;
+    this.size=Math.random()*1.5+0.5;
+    this.opacity=Math.random()*0.5+0.08;
+    this.color=Math.random()>0.7?'0,245,196':'123,94,167';
+  }
+  update(){
+    // mouse repel
+    const dx=this.x-mx,dy=this.y-my,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120&&!isTouch){
+      const force=(120-dist)/120;
+      this.vx+=dx/dist*force*0.8;
+      this.vy+=dy/dist*force*0.8;
+    }
+    // dampen velocity
+    this.vx*=0.97;this.vy*=0.97;
+    this.x+=this.vx;this.y+=this.vy;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
   draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(${this.color},${this.opacity})`;ctx.fill()}
 }
-for(let i=0;i<120;i++)particles.push(new Particle());
+for(let i=0;i<140;i++)particles.push(new Particle());
 function drawConnections(){
   for(let i=0;i<particles.length;i++){
     for(let j=i+1;j<particles.length;j++){
       const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<100){ctx.beginPath();ctx.strokeStyle=`rgba(0,245,196,${0.04*(1-dist/100)})`;ctx.lineWidth=0.5;ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.stroke()}
+      if(dist<110){ctx.beginPath();ctx.strokeStyle=`rgba(0,245,196,${0.05*(1-dist/110)})`;ctx.lineWidth=0.5;ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.stroke()}
     }
   }
 }
@@ -524,6 +575,50 @@ window.addEventListener('scroll',()=>{
 
 // MOBILE MENU
 function toggleMenu(){document.getElementById('mobile-nav').classList.toggle('open')}
+
+// TYPED EFFECT
+(function(){
+  const el=document.getElementById('typed-target');
+  if(!el)return;
+  const words=['умнее','быстрее','выгоднее','точнее'];
+  let wi=0,ci=0,deleting=false;
+  function type(){
+    const word=words[wi];
+    if(!deleting){
+      el.textContent=word.slice(0,++ci);
+      if(ci===word.length){deleting=true;setTimeout(type,1800);return}
+    } else {
+      el.textContent=word.slice(0,--ci);
+      if(ci===0){deleting=false;wi=(wi+1)%words.length;setTimeout(type,400);return}
+    }
+    setTimeout(type,deleting?60:110);
+  }
+  setTimeout(type,1200);
+})();
+
+// GLITCH LOGO
+(function(){
+  const logo=document.getElementById('nav-logo');
+  if(!logo)return;
+  function triggerGlitch(){
+    logo.classList.add('glitching');
+    setTimeout(()=>logo.classList.remove('glitching'),400);
+    setTimeout(triggerGlitch,Math.random()*4000+3000);
+  }
+  setTimeout(triggerGlitch,2000);
+})();
+
+// PARALLAX HERO
+window.addEventListener('scroll',()=>{
+  const hero=document.querySelector('.hero');
+  const heroTitle=document.querySelector('.hero-title');
+  const heroSub=document.querySelector('.hero-sub');
+  const sy=window.scrollY;
+  if(heroTitle)heroTitle.style.transform=`translateY(${sy*0.25}px)`;
+  if(heroSub)heroSub.style.transform=`translateY(${sy*0.15}px)`;
+  if(hero){const orb1=document.querySelector('.orb1');const orb2=document.querySelector('.orb2');if(orb1)orb1.style.transform=`translateY(${sy*0.1}px)`;if(orb2)orb2.style.transform=`translateY(${sy*-0.08}px)`;}
+},{passive:true});
+
 </script>
 </body>
 </html>
