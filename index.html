@@ -5,269 +5,279 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AD Pulse — Altai Dynamics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --c1:#0a0a0f;
-    --c2:#0d1117;
-    --accent:#00f5c4;
-    --accent2:#7b5ea7;
-    --text:#e8e8f0;
-    --muted:#6b7080;
-    --border:rgba(255,255,255,0.08);
-  }
-  html{scroll-behavior:smooth}
-  body{background:var(--c1);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c1:#060609;--c2:#0d1117;--c3:#111820;
+  --accent:#00f5c4;--accent2:#7b5ea7;--accent3:#ff4d6d;
+  --text:#e8e8f0;--muted:#6b7080;--border:rgba(255,255,255,0.07);
+}
+html{scroll-behavior:smooth}
+body{background:var(--c1);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
 
-  /* CURSOR */
-  .cursor{position:fixed;width:12px;height:12px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s,background 0.2s;transform:translate(-50%,-50%);opacity:0}
-  .cursor-trail{position:fixed;width:40px;height:40px;border:1px solid rgba(0,245,196,0.3);border-radius:50%;pointer-events:none;z-index:9998;transition:transform 0.15s ease;transform:translate(-50%,-50%);opacity:0}
+/* CURSOR */
+.cursor{position:fixed;width:10px;height:10px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:0;transition:transform 0.15s,background 0.2s,width 0.2s,height 0.2s}
+.cursor-trail{position:fixed;width:36px;height:36px;border:1px solid rgba(0,245,196,0.25);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:0}
+@media(hover:none),(pointer:coarse){body{cursor:auto}.cursor,.cursor-trail{display:none!important}}
 
-  /* BG */
-  #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  .noise{position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");z-index:1;pointer-events:none;opacity:0.4}
-  .grid-lines{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:60px 60px}
-  .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:0.12}
-  .orb1{width:600px;height:600px;background:radial-gradient(circle,#00f5c4,transparent);top:-200px;right:-200px}
-  .orb2{width:400px;height:400px;background:radial-gradient(circle,#7b5ea7,transparent);bottom:20%;left:-150px}
+/* BG */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E")}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:72px 72px}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(100px)}
+.orb1{width:700px;height:700px;background:radial-gradient(circle,rgba(0,245,196,0.07),transparent 70%);top:-300px;right:-200px}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(123,94,167,0.08),transparent 70%);bottom:10%;left:-200px}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,rgba(255,77,109,0.04),transparent 70%);top:40%;left:40%}
 
-  /* NAV */
-  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.5rem 4rem;backdrop-filter:blur(20px);border-bottom:1px solid var(--border);background:rgba(10,10,15,0.7);transition:all 0.3s}
-  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:0.1em;color:var(--accent);text-decoration:none}
-  .nav-logo span{color:var(--text);opacity:0.5}
-  .nav-links{display:flex;gap:2.5rem;list-style:none}
-  .nav-links a{color:var(--muted);font-size:0.85rem;text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;transition:color 0.2s;font-family:'Space Mono',monospace}
-  .nav-links a:hover{color:var(--accent)}
-  .nav-cta{background:var(--accent);color:var(--c1);padding:0.6rem 1.5rem;border:none;font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:none;text-decoration:none;clip-path:polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);transition:all 0.2s;display:inline-block}
-  .nav-cta:hover{background:#00ddb0;transform:scale(1.03)}
-  .burger{display:none;flex-direction:column;gap:5px;cursor:none;padding:4px}
-  .burger span{display:block;width:24px;height:2px;background:var(--text);transition:all 0.3s}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;backdrop-filter:blur(24px);border-bottom:1px solid var(--border);background:rgba(6,6,9,0.6);transition:background 0.3s}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:0.08em;color:var(--accent);text-decoration:none;position:relative}
+.nav-logo span{color:rgba(255,255,255,0.35)}
+.nav-logo::before,.nav-logo::after{content:attr(data-text);position:absolute;top:0;left:0;font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:0.08em;opacity:0;pointer-events:none}
+.nav-logo::before{color:#ff4d6d}
+.nav-logo::after{color:#00f5c4}
+.nav-logo.glitching::before{opacity:0.8;animation:g1 0.35s steps(3) forwards}
+.nav-logo.glitching::after{opacity:0.8;animation:g2 0.35s steps(3) forwards}
+@keyframes g1{0%{clip-path:inset(20% 0 60% 0);transform:translate(-4px)}50%{clip-path:inset(60% 0 10% 0);transform:translate(4px)}100%{clip-path:inset(0 0 100% 0);transform:translate(0)}}
+@keyframes g2{0%{clip-path:inset(50% 0 20% 0);transform:translate(4px)}50%{clip-path:inset(10% 0 70% 0);transform:translate(-4px)}100%{clip-path:inset(0 0 100% 0);transform:translate(0)}}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);font-size:0.78rem;text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.2s;font-family:'Space Mono',monospace}
+.nav-links a:hover{color:var(--accent)}
+.nav-cta{background:var(--accent);color:var(--c1);padding:0.55rem 1.4rem;font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:none;text-decoration:none;clip-path:polygon(7px 0%,100% 0%,100% calc(100% - 7px),calc(100% - 7px) 100%,0% 100%,0% 7px);transition:all 0.2s;display:inline-block}
+.nav-cta:hover{background:#00ddb0;transform:scale(1.03)}
+.burger{display:none;flex-direction:column;gap:5px;cursor:none;padding:4px;background:none;border:none}
+.burger span{display:block;width:22px;height:1.5px;background:var(--text)}
+.mobile-nav{display:none;position:fixed;inset:0;background:rgba(6,6,9,0.97);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;backdrop-filter:blur(20px)}
+.mobile-nav.open{display:flex}
+.mobile-nav a{font-family:'Syne',sans-serif;font-weight:700;font-size:1.8rem;color:var(--text);text-decoration:none;transition:color 0.2s}
+.mobile-nav a:hover{color:var(--accent)}
+.mobile-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--text);font-size:1.8rem;cursor:none;font-family:'Space Mono',monospace}
 
-  /* HERO */
-  .hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:8rem 4rem 4rem;overflow:hidden}
-  .hero-eyebrow{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
-  .hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--accent)}
-  .hero-title{font-family:'Syne',sans-serif;font-size:clamp(3.5rem,9vw,9rem);font-weight:800;line-height:0.9;letter-spacing:-0.03em;margin-bottom:2rem}
-  .hero-title .line{display:block;overflow:visible}
-  .hero-title .line:last-child{display:flex;align-items:baseline;gap:0;overflow:hidden}
-  .hero-title .line span{display:block;transform:translateY(110%);animation:slideUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
-  .hero-title .line:nth-child(1) span{animation-delay:0.1s}
-  .hero-title .line:nth-child(2) span{animation-delay:0.2s}
-  .hero-title .line:nth-child(3) span{animation-delay:0.3s}
-  .hero-title .accent{color:var(--accent)}
-  .hero-title .stroke{-webkit-text-stroke:1px rgba(255,255,255,0.3);color:transparent;white-space:nowrap}
-  @keyframes slideUp{to{transform:translateY(0)}}
-  .hero-sub{max-width:500px;font-size:1.05rem;line-height:1.7;color:var(--muted);margin-bottom:3rem;opacity:0;animation:fadeIn 1s 0.6s forwards}
-  @keyframes fadeIn{to{opacity:1}}
-  .hero-actions{display:flex;align-items:center;gap:2rem;opacity:0;animation:fadeIn 1s 0.8s forwards;flex-wrap:wrap}
-  .btn-primary{background:var(--accent);color:var(--c1);padding:1rem 2.5rem;border:none;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;letter-spacing:0.05em;cursor:none;clip-path:polygon(12px 0%,100% 0%,100% calc(100% - 12px),calc(100% - 12px) 100%,0% 100%,0% 12px);transition:all 0.3s;display:inline-block;text-decoration:none}
-  .btn-primary:hover{background:#00ddb0;transform:translateY(-2px)}
-  .btn-ghost{color:var(--text);font-family:'Space Mono',monospace;font-size:0.85rem;text-decoration:none;display:flex;align-items:center;gap:0.5rem;letter-spacing:0.05em;transition:color 0.2s}
-  .btn-ghost:hover{color:var(--accent)}
-  .btn-ghost::after{content:'→';transition:transform 0.2s}
-  .btn-ghost:hover::after{transform:translateX(4px)}
-  .hero-stats{position:absolute;right:4rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2rem;opacity:0;animation:fadeIn 1s 1s forwards}
-  .hero-stat{text-align:right}
-  .hero-stat-num{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;color:var(--accent);line-height:1}
-  .hero-stat-label{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:0.3rem}
+/* HERO */
+.hero{position:relative;z-index:2;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:7rem 4rem 4rem;gap:4rem;overflow:hidden}
+.hero-left{}
+.hero-badge{display:inline-flex;align-items:center;gap:0.6rem;border:1px solid rgba(0,245,196,0.25);padding:0.35rem 0.9rem;background:rgba(0,245,196,0.04);margin-bottom:2rem;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent)}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bdot 2s infinite}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+.hero-title{font-family:'Syne',sans-serif;font-weight:800;line-height:0.88;letter-spacing:-0.04em;font-size:clamp(3.5rem,6.5vw,7.5rem);margin-bottom:1.8rem}
+.hero-title .line{display:block;overflow:hidden}
+.hero-title .line span{display:block;transform:translateY(110%);animation:sup 1s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-title .l1 span{animation-delay:0.05s}
+.hero-title .l2 span{animation-delay:0.15s;color:var(--accent)}
+.hero-title .l3{display:flex;align-items:baseline;overflow:hidden}
+.hero-title .l3 span:first-child{display:block;transform:translateY(110%);animation:sup 1s cubic-bezier(0.16,1,0.3,1) 0.25s forwards;-webkit-text-stroke:1px rgba(255,255,255,0.2);color:transparent}
+.typed-cur{display:inline-block;width:3px;height:0.8em;background:var(--accent);margin-left:3px;vertical-align:middle;animation:blink 0.7s step-end infinite}
+@keyframes sup{to{transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-sub{max-width:440px;font-size:1rem;line-height:1.75;color:var(--muted);margin-bottom:2.5rem;opacity:0;animation:fin 1s 0.6s forwards}
+@keyframes fin{to{opacity:1}}
+.hero-actions{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;opacity:0;animation:fin 1s 0.8s forwards}
+.btn-p{background:var(--accent);color:var(--c1);padding:0.9rem 2.2rem;font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;cursor:none;clip-path:polygon(10px 0%,100% 0%,100% calc(100% - 10px),calc(100% - 10px) 100%,0% 100%,0% 10px);transition:all 0.3s;display:inline-block;text-decoration:none;letter-spacing:0.02em}
+.btn-p:hover{background:#00ddb0;transform:translateY(-2px)}
+.btn-g{color:var(--muted);font-family:'Space Mono',monospace;font-size:0.8rem;text-decoration:none;display:flex;align-items:center;gap:0.5rem;transition:color 0.2s;letter-spacing:0.04em}
+.btn-g:hover{color:var(--accent)}
+.btn-g svg{transition:transform 0.2s}
+.btn-g:hover svg{transform:translateX(4px)}
+.hero-meta{display:flex;gap:2.5rem;margin-top:3rem;opacity:0;animation:fin 1s 1s forwards}
+.hero-stat-n{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent);line-height:1}
+.hero-stat-l{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:0.25rem}
 
-  /* MARQUEE */
-  .marquee-wrap{position:relative;z-index:2;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:1rem 0;background:rgba(255,255,255,0.02)}
-  .marquee{display:flex;gap:3rem;animation:marquee 20s linear infinite;white-space:nowrap}
-  .marquee-item{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:1rem;flex-shrink:0}
-  .marquee-item .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
-  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* PHONE MOCKUP */
+.hero-right{display:flex;justify-content:center;align-items:center;opacity:0;animation:fin 1s 0.5s forwards}
+.phone-frame{width:280px;height:560px;background:#0a0e16;border:1.5px solid rgba(255,255,255,0.12);border-radius:36px;padding:16px 14px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04),inset 0 0 0 1px rgba(255,255,255,0.02);flex-shrink:0}
+.phone-frame::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:90px;height:26px;background:#0a0e16;border-radius:0 0 18px 18px;border:1.5px solid rgba(255,255,255,0.12);border-top:none;z-index:10}
+.phone-frame::after{content:'';position:absolute;inset:0;border-radius:36px;background:conic-gradient(from 180deg,transparent 60%,rgba(0,245,196,0.06) 80%,transparent 100%);animation:prot 6s linear infinite;pointer-events:none}
+@keyframes prot{to{transform:rotate(360deg)}}
 
-  /* SECTIONS */
-  section{position:relative;z-index:2;padding:6rem 4rem}
-  .section-label{font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
-  .section-label::before{content:'//'}
-  .section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,4rem);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1.5rem}
-  .section-desc{max-width:600px;color:var(--muted);font-size:1rem;line-height:1.8;margin-bottom:3rem}
+/* APP INSIDE PHONE */
+.app-wrap{height:100%;display:flex;flex-direction:column;overflow:hidden;border-radius:24px;position:relative;z-index:2}
+.app-header{background:#111820;padding:10px 12px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.app-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:0.75rem;color:var(--accent);letter-spacing:0.08em}
+.app-logo span{color:rgba(255,255,255,0.4)}
+.app-notif{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:bdot 1.5s infinite}
+.app-nav{background:#0d1117;display:flex;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
+.app-nav-item{flex:1;padding:8px 4px;text-align:center;font-family:'Space Mono',monospace;font-size:0.48rem;letter-spacing:0.05em;color:var(--muted);transition:color 0.2s;cursor:default;text-transform:uppercase}
+.app-nav-item.active{color:var(--accent);border-bottom:1px solid var(--accent)}
+.app-body{flex:1;overflow:hidden;background:#080c12;padding:10px;display:flex;flex-direction:column;gap:8px}
 
-  /* FEATURES GRID — rich hover */
-  .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--border);background:var(--border)}
-  .feature-card{
-    background:var(--c2);padding:2.5rem;
-    position:relative;overflow:hidden;
-    transition:background 0.4s,transform 0.4s;
-  }
-  /* shimmer sweep on hover */
-  .feature-card::after{
-    content:'';position:absolute;
-    top:-60%;left:-60%;
-    width:60%;height:220%;
-    background:linear-gradient(105deg,transparent 40%,rgba(0,245,196,0.07) 50%,transparent 60%);
-    transform:skewX(-15deg) translateX(-200%);
-    transition:transform 0.7s ease;
-  }
-  .feature-card:hover::after{transform:skewX(-15deg) translateX(500%)}
-  /* accent top bar */
-  .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform 0.5s;transform-origin:left}
-  .feature-card:hover{background:rgba(0,245,196,0.04);transform:translateY(-3px)}
-  .feature-card:hover::before{transform:scaleX(1)}
-  /* icon glow on hover */
-  .feature-card:hover .feature-icon{border-color:rgba(0,245,196,0.5);box-shadow:0 0 20px rgba(0,245,196,0.15)}
-  .feature-card:hover .feature-title{color:var(--accent)}
-  .feature-num{font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;color:rgba(255,255,255,0.04);line-height:1;margin-bottom:1rem}
-  .feature-icon{width:48px;height:48px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;font-size:1.5rem;clip-path:polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);transition:border-color 0.3s,box-shadow 0.3s}
-  .feature-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:0.75rem;transition:color 0.3s}
-  .feature-desc{color:var(--muted);font-size:0.9rem;line-height:1.7}
+/* DASHBOARD INSIDE */
+.dash-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dash-stat{background:#111820;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px 10px}
+.dash-stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);line-height:1}
+.dash-stat-lbl{font-family:'Space Mono',monospace;font-size:0.42rem;color:var(--muted);margin-top:3px;letter-spacing:0.05em;text-transform:uppercase}
+.dash-stat-chg{font-size:0.42rem;color:#4ade80;margin-top:2px;font-family:'Space Mono',monospace}
 
-  /* HOW IT WORKS */
-  .how-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
-  .steps{display:flex;flex-direction:column;gap:0}
-  .step{display:flex;gap:2rem;padding:2rem 0;border-bottom:1px solid var(--border);position:relative;cursor:none;transition:all 0.3s}
-  .step:hover .step-num{color:var(--accent)}
-  .step-num{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:rgba(255,255,255,0.08);line-height:1;min-width:70px;transition:color 0.3s}
-  .step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:0.5rem}
-  .step-desc{color:var(--muted);font-size:0.9rem;line-height:1.6}
+/* CHART BAR */
+.dash-chart{background:#111820;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px 10px}
+.dash-chart-title{font-family:'Space Mono',monospace;font-size:0.45rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.bars{display:flex;align-items:flex-end;gap:3px;height:36px}
+.bar{flex:1;border-radius:2px 2px 0 0;background:rgba(0,245,196,0.15);transition:height 0.5s}
+.bar.hi{background:var(--accent)}
 
-  /* PHONE MOCK */
-  .phone-mock{position:relative;background:var(--c2);border:1px solid var(--border);border-radius:2rem;padding:1.5rem;max-width:320px;margin:0 auto;overflow:hidden}
-  .phone-mock::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(0,245,196,0.05),transparent);animation:rotate 8s linear infinite}
-  @keyframes rotate{to{transform:rotate(360deg)}}
-  .phone-notch{width:80px;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:0 auto 1.5rem}
-  .chat-msg{display:flex;flex-direction:column;gap:0.75rem;position:relative;z-index:1}
-  .msg{padding:0.75rem 1rem;font-size:0.8rem;line-height:1.5;max-width:80%}
-  .msg-in{background:rgba(0,245,196,0.1);border:1px solid rgba(0,245,196,0.2);border-radius:0 1rem 1rem 1rem;color:var(--accent);align-self:flex-start}
-  .msg-out{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:1rem 1rem 0 1rem;align-self:flex-end}
-  .msg-time{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:0.25rem}
+/* LEADS LIST */
+.dash-leads{background:#111820;border:1px solid rgba(255,255,255,0.06);border-radius:8px;overflow:hidden}
+.dash-leads-hd{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between}
+.dash-leads-title{font-family:'Space Mono',monospace;font-size:0.45rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
+.dash-leads-badge{background:rgba(0,245,196,0.1);color:var(--accent);font-family:'Space Mono',monospace;font-size:0.4rem;padding:2px 5px;border-radius:3px}
+.lead-row{display:flex;align-items:center;gap:7px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.lead-row:last-child{border-bottom:none}
+.lead-ava{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:0.45rem;flex-shrink:0}
+.lead-info{flex:1;min-width:0}
+.lead-name{font-size:0.55rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Inter',sans-serif}
+.lead-co{font-family:'Space Mono',monospace;font-size:0.4rem;color:var(--muted);margin-top:1px}
+.lead-amt{font-family:'Syne',sans-serif;font-weight:800;font-size:0.5rem;color:var(--accent);white-space:nowrap}
+.lead-status{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.st-new{background:var(--accent)}
+.st-prog{background:#f59e0b}
+.st-done{background:#4ade80}
 
-  /* CTA */
-  .cta-section{text-align:center;padding:8rem 4rem;position:relative;overflow:hidden}
-  .cta-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,245,196,0.06) 0%,transparent 70%);pointer-events:none}
-  .cta-section .section-title{font-size:clamp(2.5rem,6vw,5rem);margin:0 auto 1.5rem}
-  .cta-section .section-desc{margin:0 auto 3rem}
+/* WA NOTIFY */
+.wa-notify{background:#111820;border:1px solid rgba(37,211,102,0.2);border-radius:8px;padding:8px 10px;display:flex;gap:7px;align-items:flex-start}
+.wa-icon{width:22px;height:22px;border-radius:50%;background:rgba(37,211,102,0.15);display:flex;align-items:center;justify-content:center;font-size:0.6rem;flex-shrink:0}
+.wa-text{}
+.wa-from{font-family:'Space Mono',monospace;font-size:0.42rem;color:#4ade80;letter-spacing:0.05em;margin-bottom:3px}
+.wa-msg{font-size:0.52rem;color:var(--text);line-height:1.4;font-family:'Inter',sans-serif}
+.wa-time{font-family:'Space Mono',monospace;font-size:0.38rem;color:var(--muted);margin-top:3px}
 
-  /* FOOTER */
-  footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:2.5rem 4rem;display:flex;flex-direction:column;gap:1.5rem}
-  .footer-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem}
-  .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent)}
-  .footer-links{display:flex;gap:2rem;list-style:none}
-  .footer-links a{color:var(--muted);font-family:'Space Mono',monospace;font-size:0.75rem;text-decoration:none;letter-spacing:0.1em;transition:color 0.2s}
-  .footer-links a:hover{color:var(--text)}
-  .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;border-top:1px solid var(--border);padding-top:1.5rem}
-  .footer-hub{display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;flex-shrink:0}
-  .hub-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
-  .hub-logo{height:28px;width:auto;opacity:0.7;filter:brightness(0) invert(1);transition:opacity 0.2s}
-  .hub-logo:hover{opacity:1}
-  .footer-copy{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.05em}
-  .footer-rights{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);opacity:0.7;max-width:500px;line-height:1.6}
+/* MARQUEE */
+.mq-wrap{position:relative;z-index:2;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:0.9rem 0;background:rgba(255,255,255,0.015)}
+.mq{display:flex;gap:3rem;animation:mq 22s linear infinite;white-space:nowrap}
+.mq-item{font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:0.8rem;flex-shrink:0}
+.mq-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-  /* DIVIDER */
-  .divider{border:none;border-top:1px solid var(--border);margin:0 4rem}
+/* SECTIONS */
+section{position:relative;z-index:2;padding:6rem 4rem}
+.s-label{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem}
+.s-label::before{content:'//'}
+.s-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4.5vw,3.8rem);line-height:1.05;letter-spacing:-0.025em;margin-bottom:1.5rem}
+.s-desc{max-width:580px;color:var(--muted);font-size:0.975rem;line-height:1.8;margin-bottom:3rem}
+.divider{border:none;border-top:1px solid var(--border);margin:0 4rem}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s,transform 0.7s}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-  /* TAG */
-  .tag{display:inline-flex;align-items:center;gap:0.5rem;border:1px solid rgba(0,245,196,0.3);padding:0.3rem 0.75rem;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;background:rgba(0,245,196,0.05)}
-  .tag-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--border);background:var(--border)}
+.feat-card{background:var(--c2);padding:2.5rem;position:relative;overflow:hidden;transition:background 0.4s,transform 0.4s}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform 0.5s;transform-origin:left}
+.feat-card::after{content:'';position:absolute;top:-60%;left:-60%;width:60%;height:220%;background:linear-gradient(105deg,transparent 40%,rgba(0,245,196,0.055) 50%,transparent 60%);transform:skewX(-15deg) translateX(-200%);transition:transform 0.7s ease}
+.feat-card:hover{background:rgba(0,245,196,0.035);transform:translateY(-3px)}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-card:hover::after{transform:skewX(-15deg) translateX(500%)}
+.feat-card:hover .feat-icon{border-color:rgba(0,245,196,0.5);box-shadow:0 0 18px rgba(0,245,196,0.12)}
+.feat-card:hover .feat-title{color:var(--accent)}
+.feat-n{font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:800;color:rgba(255,255,255,0.035);line-height:1;margin-bottom:1rem}
+.feat-icon{width:44px;height:44px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;font-size:1.3rem;clip-path:polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);transition:border-color 0.3s,box-shadow 0.3s}
+.feat-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:0.6rem;transition:color 0.3s}
+.feat-desc{color:var(--muted);font-size:0.875rem;line-height:1.65}
 
-  /* SCROLL REVEAL */
-  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s,transform 0.7s}
-  .reveal.visible{opacity:1;transform:translateY(0)}
+/* HOW IT WORKS */
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:1.75rem;padding:1.75rem 0;border-bottom:1px solid var(--border);cursor:default;transition:all 0.3s}
+.step:hover .step-n{color:var(--accent)}
+.step-n{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;color:rgba(255,255,255,0.06);line-height:1;min-width:60px;transition:color 0.3s}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.4rem}
+.step-desc{color:var(--muted);font-size:0.875rem;line-height:1.6}
 
-  /* INTEGRATIONS */
-  .integrations{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem}
-  .int-chip{border:1px solid var(--border);padding:0.5rem 1.25rem;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);transition:all 0.2s;background:var(--c2)}
-  .int-chip:hover{border-color:rgba(0,245,196,0.4);color:var(--accent)}
+/* FOR WHOM */
+.fw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.fw-card{border:1px solid var(--border);padding:1.75rem;background:var(--c2);position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s;cursor:default}
+.fw-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform 0.4s}
+.fw-card:hover{border-color:rgba(0,245,196,0.25);transform:translateY(-4px)}
+.fw-card:hover::after{transform:scaleX(1)}
+.fw-emoji{font-size:1.8rem;margin-bottom:1rem}
+.fw-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:0.6rem}
+.fw-desc{color:var(--muted);font-size:0.82rem;line-height:1.6;margin-bottom:0.9rem}
+.fw-tag{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--accent);letter-spacing:0.1em;border:1px solid rgba(0,245,196,0.18);display:inline-block;padding:0.2rem 0.55rem;background:rgba(0,245,196,0.04)}
 
-  /* RESPONSIVE */
-  @media(max-width:900px){
-    nav{padding:1.2rem 1.5rem}
-    .nav-links,.nav-cta{display:none}
-    .burger{display:flex}
-    .hero{padding:7rem 1.5rem 4rem}
-    .hero-stats{display:none}
-    section{padding:4rem 1.5rem}
-    .how-wrap{grid-template-columns:1fr;gap:3rem}
-    footer{padding:2rem 1.5rem}
-    .footer-top{flex-direction:column;text-align:center}
-    .footer-links{justify-content:center}
-    .footer-bottom{flex-direction:column;text-align:center}
-    .footer-hub{align-items:center}
-    hr.divider{margin:0 1.5rem}
-  }
-  @media(max-width:900px){
-    .features-grid{grid-template-columns:repeat(2,1fr)}
-  }
-  @media(max-width:600px){
-    .features-grid{grid-template-columns:1fr;background:transparent;border:none;gap:1rem}
-    .feature-card{border:1px solid var(--border)}
-  }
+/* INTEGRATIONS */
+.int-wrap{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:2rem}
+.int-chip{border:1px solid var(--border);padding:0.45rem 1rem;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);transition:all 0.2s;background:var(--c2)}
+.int-chip:hover{border-color:rgba(0,245,196,0.35);color:var(--accent)}
 
-  /* MOBILE NAV */
-  .mobile-nav{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--c1);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
-  .mobile-nav.open{display:flex}
-  .mobile-nav a{font-family:'Syne',sans-serif;font-weight:700;font-size:2rem;color:var(--text);text-decoration:none;transition:color 0.2s}
-  .mobile-nav a:hover{color:var(--accent)}
-  .mobile-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--text);font-size:2rem;cursor:none}
-  .count-up{display:inline-block}
+/* VIDEO BTN */
+.video-btn{display:inline-flex;align-items:center;gap:1rem;background:var(--c2);border:1px solid var(--border);padding:1rem 2rem;cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--text)}
+.video-btn:hover{border-color:rgba(0,245,196,0.35);background:rgba(0,245,196,0.03)}
+.vplay{width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--c1);flex-shrink:0;transition:transform 0.3s}
+.video-btn:hover .vplay{transform:scale(1.12)}
+.vdur{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)}
+.vmodal{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:1000;display:none;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(12px)}
+.vmodal.open{display:flex}
+.vmodal-inner{position:relative;width:100%;max-width:800px;background:var(--c2);border:1px solid var(--border)}
+.vmodal-close{position:absolute;top:-2.5rem;right:0;background:none;border:none;color:var(--text);font-size:1.4rem;cursor:none;font-family:'Space Mono',monospace;opacity:0.5;transition:opacity 0.2s}
+.vmodal-close:hover{opacity:1}
+.vmodal-screen{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:var(--c1);position:relative;overflow:hidden}
+.vmodal-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:rgba(0,245,196,0.03);animation:vpulse 3s ease-in-out infinite;pointer-events:none}
+@keyframes vpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(2);opacity:0}}
+.vmodal-content{position:relative;z-index:1;text-align:center;padding:2rem}
+.vmodal-content h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:0.5rem}
+.vmodal-content p{color:var(--muted);font-size:0.9rem;margin-bottom:2rem}
 
-  /* GLITCH LOGO */
-  .nav-logo{position:relative}
-  .nav-logo::before,.nav-logo::after{content:attr(data-text);position:absolute;top:0;left:0;font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:0.1em;opacity:0;pointer-events:none}
-  .nav-logo::before{color:#ff4d6d}
-  .nav-logo::after{color:#00f5c4}
-  .nav-logo.glitching::before{opacity:0.8;animation:glitch1 0.35s steps(3) forwards}
-  .nav-logo.glitching::after{opacity:0.8;animation:glitch2 0.35s steps(3) forwards}
-  @keyframes glitch1{0%{clip-path:inset(20% 0 60% 0);transform:translate(-4px,0)}33%{clip-path:inset(60% 0 10% 0);transform:translate(4px,0)}66%{clip-path:inset(40% 0 30% 0);transform:translate(-2px,0)}100%{clip-path:inset(0 0 100% 0);transform:translate(0)}}
-  @keyframes glitch2{0%{clip-path:inset(50% 0 20% 0);transform:translate(4px,0)}33%{clip-path:inset(10% 0 70% 0);transform:translate(-4px,0)}66%{clip-path:inset(70% 0 5% 0);transform:translate(2px,0)}100%{clip-path:inset(0 0 100% 0);transform:translate(0)}}
+/* FAQ */
+.faq-list{max-width:720px;display:flex;flex-direction:column}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;background:none;border:none;padding:1.4rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:none;text-align:left;font-family:'Syne',sans-serif;font-size:0.975rem;font-weight:600;color:var(--text);transition:color 0.2s}
+.faq-q:hover{color:var(--accent)}
+.faq-arrow{font-size:1.4rem;color:var(--accent);flex-shrink:0;transition:transform 0.3s;font-family:monospace;line-height:1;font-weight:300}
+.faq-item.open .faq-arrow{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s;font-size:0.925rem;line-height:1.7;color:var(--muted);padding:0}
+.faq-item.open .faq-a{max-height:180px;padding-bottom:1.4rem}
 
-  /* TYPED CURSOR BLINK */
-  .typed-cursor{display:inline-block;width:3px;height:0.8em;background:var(--accent);margin-left:4px;vertical-align:middle;animation:tblink 0.7s step-end infinite}
-  @keyframes tblink{0%,100%{opacity:1}50%{opacity:0}}
+/* CTA */
+.cta-sec{text-align:center;padding:8rem 4rem;position:relative;overflow:hidden}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,245,196,0.05) 0%,transparent 65%);pointer-events:none}
+.cta-sec .s-title{font-size:clamp(2.5rem,5.5vw,5rem);margin:0 auto 1.5rem}
+.cta-sec .s-desc{margin:0 auto 3rem}
 
-  /* FLOATING WHATSAPP */
-  .wa-float{position:fixed;bottom:2rem;right:2rem;z-index:500;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform 0.3s,box-shadow 0.3s;animation:waFloat 3s ease-in-out infinite}
-  .wa-float:hover{transform:scale(1.12)!important;box-shadow:0 6px 30px rgba(37,211,102,0.65);animation:none}
-  .wa-float svg{width:28px;height:28px;fill:#fff}
-  @keyframes waFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+/* FOOTER */
+footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:2.5rem 4rem;display:flex;flex-direction:column;gap:1.25rem}
+.ft-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem}
+.ft-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--accent)}
+.ft-links{display:flex;gap:2rem;list-style:none}
+.ft-links a{color:var(--muted);font-family:'Space Mono',monospace;font-size:0.7rem;text-decoration:none;letter-spacing:0.1em;transition:color 0.2s}
+.ft-links a:hover{color:var(--text)}
+.ft-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--border);padding-top:1.25rem}
+.ft-copy{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted)}
+.ft-rights{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);opacity:0.6;max-width:460px;line-height:1.6}
+.ft-hub{display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem}
+.hub-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+.hub-img{height:26px;opacity:0.65;filter:brightness(0) invert(1);transition:opacity 0.2s}
+.hub-img:hover{opacity:1}
 
-  /* FOR WHOM */
-  .fw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:3rem}
-  .fw-card{border:1px solid var(--border);padding:2rem;background:var(--c2);position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
-  .fw-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform 0.4s}
-  .fw-card:hover{border-color:rgba(0,245,196,0.3);transform:translateY(-4px)}
-  .fw-card:hover::before{transform:scaleX(1)}
-  .fw-icon{font-size:2rem;margin-bottom:1rem}
-  .fw-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem}
-  .fw-desc{color:var(--muted);font-size:0.85rem;line-height:1.6;margin-bottom:1rem}
-  .fw-tag{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);letter-spacing:0.1em;border:1px solid rgba(0,245,196,0.2);display:inline-block;padding:0.25rem 0.6rem;background:rgba(0,245,196,0.04)}
-  @media(max-width:900px){.fw-grid{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:600px){.fw-grid{grid-template-columns:1fr}}
+/* FLOATING WA */
+.wa-float{position:fixed;bottom:2rem;right:2rem;z-index:500;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 18px rgba(37,211,102,0.35);animation:waf 3s ease-in-out infinite}
+.wa-float:hover{transform:scale(1.12)!important;animation:none;box-shadow:0 6px 28px rgba(37,211,102,0.6)}
+.wa-float svg{width:26px;height:26px;fill:#fff}
+@keyframes waf{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-  /* VIDEO BUTTON */
-  .video-btn{display:inline-flex;align-items:center;gap:1.2rem;background:var(--c2);border:1px solid var(--border);padding:1.2rem 2.5rem;cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text)}
-  .video-btn:hover{border-color:rgba(0,245,196,0.4);background:rgba(0,245,196,0.04)}
-  .video-play{width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--c1);flex-shrink:0;transition:transform 0.3s}
-  .video-btn:hover .video-play{transform:scale(1.1)}
-  .video-dur{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);margin-left:0.5rem}
-
-  /* VIDEO MODAL */
-  .vmodal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(10px)}
-  .vmodal.open{display:flex}
-  .vmodal-inner{position:relative;width:100%;max-width:800px;background:var(--c2);border:1px solid var(--border)}
-  .vmodal-close{position:absolute;top:-2.5rem;right:0;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:none;font-family:'Space Mono',monospace;opacity:0.6;transition:opacity 0.2s}
-  .vmodal-close:hover{opacity:1}
-  .vmodal-screen{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:var(--c1);position:relative;overflow:hidden}
-  .vmodal-placeholder{text-align:center;padding:2rem;position:relative;z-index:1}
-  .vmodal-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;background:rgba(0,245,196,0.03);animation:vpulse 3s ease-in-out infinite}
-  @keyframes vpulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
-
-  /* FAQ */
-  .faq-list{max-width:760px;display:flex;flex-direction:column;gap:0;margin-top:2rem}
-  .faq-item{border-bottom:1px solid var(--border)}
-  .faq-q{width:100%;background:none;border:none;padding:1.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:none;text-align:left;font-family:'Syne',sans-serif;font-size:1rem;font-weight:600;color:var(--text);transition:color 0.2s}
-  .faq-q:hover{color:var(--accent)}
-  .faq-arrow{font-size:1.5rem;font-weight:300;color:var(--accent);flex-shrink:0;transition:transform 0.3s;font-family:monospace;line-height:1}
-  .faq-item.open .faq-arrow{transform:rotate(45deg)}
-  .faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s;font-size:0.95rem;line-height:1.7;color:var(--muted);padding:0}
-  .faq-item.open .faq-a{max-height:200px;padding-bottom:1.5rem}
-
-  /* HIDE CURSOR ON TOUCH */
-  @media(hover:none),(pointer:coarse){body{cursor:auto}.cursor,.cursor-trail{display:none!important}}
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .hero{grid-template-columns:1fr;padding:7rem 2rem 3rem;text-align:left}
+  .hero-right{display:none}
+}
+@media(max-width:900px){
+  nav{padding:1.1rem 1.5rem}
+  .nav-links,.nav-cta{display:none}
+  .burger{display:flex}
+  section{padding:4rem 1.5rem}
+  .feat-grid{grid-template-columns:repeat(2,1fr)}
+  .how-grid{grid-template-columns:1fr;gap:3rem}
+  .fw-grid{grid-template-columns:repeat(2,1fr)}
+  .divider{margin:0 1.5rem}
+  footer{padding:2rem 1.5rem}
+  .ft-top{flex-direction:column}
+  .ft-bottom{flex-direction:column;text-align:center}
+  .ft-hub{align-items:center}
+}
+@media(max-width:600px){
+  .hero{padding:6rem 1.5rem 3rem}
+  .feat-grid{grid-template-columns:1fr;background:transparent;border:none;gap:1rem}
+  .feat-card{border:1px solid var(--border)}
+  .fw-grid{grid-template-columns:1fr}
+  .hero-meta{gap:1.5rem}
+}
 </style>
 </head>
 <body>
@@ -275,9 +285,10 @@
 <div class="cursor" id="cursor"></div>
 <div class="cursor-trail" id="cursor-trail"></div>
 <div class="noise"></div>
-<div class="grid-lines"></div>
+<div class="grid-bg"></div>
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
+<div class="orb orb3"></div>
 <canvas id="bg-canvas"></canvas>
 
 <!-- NAV -->
@@ -285,123 +296,178 @@
   <a href="#" class="nav-logo" id="nav-logo" data-text="ADPulse">AD<span>Pulse</span></a>
   <ul class="nav-links">
     <li><a href="#features">Возможности</a></li>
+    <li><a href="#how">Как работает</a></li>
+    <li><a href="#integrations">Интеграции</a></li>
     <li><a href="#forwhom">Для кого</a></li>
     <li><a href="#faq">FAQ</a></li>
-    <li><a href="about.html">О нас</a></li>
-    <li><a href="contact.html">Контакт</a></li>
+    <li><a href="#contact">Контакт</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Демо</a>
-  <div class="burger" id="burger" onclick="toggleMenu()">
-    <span></span><span></span><span></span>
-  </div>
+  <button class="burger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- MOBILE NAV -->
 <div class="mobile-nav" id="mobile-nav">
   <button class="mobile-close" onclick="toggleMenu()">✕</button>
   <a href="#features" onclick="toggleMenu()">Возможности</a>
   <a href="#how" onclick="toggleMenu()">Как работает</a>
-  <a href="#integrations" onclick="toggleMenu()">Интеграции</a>
+  <a href="#forwhom" onclick="toggleMenu()">Для кого</a>
+  <a href="#faq" onclick="toggleMenu()">FAQ</a>
   <a href="#contact" onclick="toggleMenu()">Контакт</a>
-  <a href="#contact" class="btn-primary" onclick="toggleMenu()" style="margin-top:1rem">Демо →</a>
 </div>
 
 <!-- HERO -->
 <section class="hero" id="home">
-  <div class="hero-eyebrow">Altai Dynamics</div>
-  <h1 class="hero-title">
-    <div class="line"><span>Управляй</span></div>
-    <div class="line"><span class="accent">бизнесом</span></div>
-    <div class="line"><span class="stroke" id="typed-target"></span><span class="typed-cursor"></span></div>
-  </h1>
-  <p class="hero-sub">
-    AD Pulse — B2B платформа нового поколения для управления материалами,
-    клиентами и продажами. WhatsApp-интеграция прямо в CRM.
-  </p>
-  <div class="hero-actions">
-    <a href="#contact" class="btn-primary">Получить демо →</a>
-    <a href="#how" class="btn-ghost">Как это работает</a>
+  <div class="hero-left">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>Altai Dynamics · B2B SaaS</div>
+    <h1 class="hero-title">
+      <div class="line l1"><span>Управляй</span></div>
+      <div class="line l2"><span>бизнесом</span></div>
+      <div class="line l3"><span id="typed-target"></span><span class="typed-cur"></span></div>
+    </h1>
+    <p class="hero-sub">AD Pulse — платформа для производственных компаний. WhatsApp CRM, склад, аналитика и 10+ интеграций в одном окне.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-p">Получить демо →</a>
+      <button class="btn-g" onclick="openVideo()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-opacity="0.5"/><path d="M6.5 5.5L11 8L6.5 10.5V5.5Z" fill="currentColor"/></svg>
+        Смотреть демо
+      </button>
+    </div>
+    <div class="hero-meta">
+      <div><div class="hero-stat-n count-up" data-target="98">0</div><div class="hero-stat-l">% uptime</div></div>
+      <div><div class="hero-stat-n count-up" data-target="3">0</div><div class="hero-stat-l">мин запуск</div></div>
+      <div><div class="hero-stat-n count-up" data-target="10">0</div><div class="hero-stat-l">интеграций</div></div>
+    </div>
   </div>
-  <div class="hero-stats">
-    <div class="hero-stat">
-      <div class="hero-stat-num count-up" data-target="98">0</div>
-      <div class="hero-stat-label">% Uptime SLA</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num count-up" data-target="3">0</div>
-      <div class="hero-stat-label">мин до запуска</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num count-up" data-target="10">0</div>
-      <div class="hero-stat-label">интеграций</div>
+
+  <!-- PHONE -->
+  <div class="hero-right">
+    <div class="phone-frame">
+      <div class="app-wrap">
+        <div class="app-header">
+          <div class="app-logo">AD<span>Pulse</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="font-family:'Space Mono',monospace;font-size:0.4rem;color:var(--muted)">09:41</div>
+            <div class="app-notif"></div>
+          </div>
+        </div>
+        <div class="app-nav">
+          <div class="app-nav-item active">Дашборд</div>
+          <div class="app-nav-item">Заявки</div>
+          <div class="app-nav-item">Склад</div>
+          <div class="app-nav-item">WhatsApp</div>
+        </div>
+        <div class="app-body" id="app-body">
+          <!-- STATS -->
+          <div class="dash-stats">
+            <div class="dash-stat">
+              <div class="dash-stat-val" id="ph-revenue">850K</div>
+              <div class="dash-stat-lbl">Выручка ₸</div>
+              <div class="dash-stat-chg">▲ +12%</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-val" id="ph-orders">24</div>
+              <div class="dash-stat-lbl">Заявки</div>
+              <div class="dash-stat-chg">▲ +5</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-val">94%</div>
+              <div class="dash-stat-lbl">Конверсия</div>
+              <div class="dash-stat-chg" style="color:#f59e0b">▼ -2%</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-val">18</div>
+              <div class="dash-stat-lbl">Клиентов</div>
+              <div class="dash-stat-chg">▲ +3</div>
+            </div>
+          </div>
+          <!-- CHART -->
+          <div class="dash-chart">
+            <div class="dash-chart-title">Продажи · неделя</div>
+            <div class="bars" id="bars"></div>
+          </div>
+          <!-- LEADS -->
+          <div class="dash-leads">
+            <div class="dash-leads-hd">
+              <div class="dash-leads-title">Последние заявки</div>
+              <div class="dash-leads-badge" id="new-badge">3 новых</div>
+            </div>
+            <div class="lead-row">
+              <div class="lead-ava" style="background:rgba(0,245,196,0.12);color:var(--accent)">АС</div>
+              <div class="lead-info">
+                <div class="lead-name">Аскар Сейткали</div>
+                <div class="lead-co">СадиГрупп</div>
+              </div>
+              <div class="lead-amt">850K ₸</div>
+              <div class="lead-status st-new"></div>
+            </div>
+            <div class="lead-row">
+              <div class="lead-ava" style="background:rgba(123,94,167,0.12);color:#c4b0e0">МД</div>
+              <div class="lead-info">
+                <div class="lead-name">Мейрам Досов</div>
+                <div class="lead-co">АлтайМеталл</div>
+              </div>
+              <div class="lead-amt">420K ₸</div>
+              <div class="lead-status st-prog"></div>
+            </div>
+            <div class="lead-row">
+              <div class="lead-ava" style="background:rgba(74,222,128,0.1);color:#4ade80">БА</div>
+              <div class="lead-info">
+                <div class="lead-name">Болат Ахметов</div>
+                <div class="lead-co">ПромСтрой KZ</div>
+              </div>
+              <div class="lead-amt">1.2M ₸</div>
+              <div class="lead-status st-done"></div>
+            </div>
+          </div>
+          <!-- WA NOTIFY -->
+          <div class="wa-notify" id="wa-notify">
+            <div class="wa-icon">💬</div>
+            <div class="wa-text">
+              <div class="wa-from">WhatsApp · Новое</div>
+              <div class="wa-msg" id="wa-msg">Добрый день! Нужен цемент М400, 200 мешков...</div>
+              <div class="wa-time" id="wa-time">только что</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- MARQUEE -->
-<div class="marquee-wrap">
-  <div class="marquee">
-    <span class="marquee-item"><span class="dot"></span>WhatsApp CRM</span>
-    <span class="marquee-item"><span class="dot"></span>Управление складом</span>
-    <span class="marquee-item"><span class="dot"></span>Аналитика продаж</span>
-    <span class="marquee-item"><span class="dot"></span>Мультитенантность</span>
-    <span class="marquee-item"><span class="dot"></span>PDF экспорт</span>
-    <span class="marquee-item"><span class="dot"></span>Telegram бот</span>
-    <span class="marquee-item"><span class="dot"></span>1С интеграция</span>
-    <span class="marquee-item"><span class="dot"></span>Платёжный модуль</span>
-    <span class="marquee-item"><span class="dot"></span>WhatsApp CRM</span>
-    <span class="marquee-item"><span class="dot"></span>Управление складом</span>
-    <span class="marquee-item"><span class="dot"></span>Аналитика продаж</span>
-    <span class="marquee-item"><span class="dot"></span>Мультитенантность</span>
-    <span class="marquee-item"><span class="dot"></span>PDF экспорт</span>
-    <span class="marquee-item"><span class="dot"></span>Telegram бот</span>
-    <span class="marquee-item"><span class="dot"></span>1С интеграция</span>
-    <span class="marquee-item"><span class="dot"></span>Платёжный модуль</span>
+<div class="mq-wrap">
+  <div class="mq">
+    <span class="mq-item"><span class="mq-dot"></span>WhatsApp CRM</span>
+    <span class="mq-item"><span class="mq-dot"></span>Управление складом</span>
+    <span class="mq-item"><span class="mq-dot"></span>Аналитика продаж</span>
+    <span class="mq-item"><span class="mq-dot"></span>Мультитенантность</span>
+    <span class="mq-item"><span class="mq-dot"></span>PDF экспорт</span>
+    <span class="mq-item"><span class="mq-dot"></span>Telegram бот</span>
+    <span class="mq-item"><span class="mq-dot"></span>1С интеграция</span>
+    <span class="mq-item"><span class="mq-dot"></span>Платёжный модуль</span>
+    <span class="mq-item"><span class="mq-dot"></span>WhatsApp CRM</span>
+    <span class="mq-item"><span class="mq-dot"></span>Управление складом</span>
+    <span class="mq-item"><span class="mq-dot"></span>Аналитика продаж</span>
+    <span class="mq-item"><span class="mq-dot"></span>Мультитенантность</span>
+    <span class="mq-item"><span class="mq-dot"></span>PDF экспорт</span>
+    <span class="mq-item"><span class="mq-dot"></span>Telegram бот</span>
+    <span class="mq-item"><span class="mq-dot"></span>1С интеграция</span>
+    <span class="mq-item"><span class="mq-dot"></span>Платёжный модуль</span>
   </div>
 </div>
 
 <!-- FEATURES -->
 <section id="features">
-  <div class="section-label">Возможности</div>
-  <h2 class="section-title reveal">Всё что нужно<br>для роста бизнеса</h2>
-  <p class="section-desc reveal">Единая платформа для производственных и торговых компаний. Никаких лишних инструментов — только то, что реально работает.</p>
-  <div class="features-grid">
-    <div class="feature-card reveal">
-      <div class="feature-num">01</div>
-      <div class="feature-icon">📦</div>
-      <div class="feature-title">Управление материалами</div>
-      <p class="feature-desc">Полный контроль склада, остатков и поставок. Автоматические уведомления о критических уровнях запасов.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-num">02</div>
-      <div class="feature-icon">💬</div>
-      <div class="feature-title">WhatsApp CRM</div>
-      <p class="feature-desc">Принимай заявки прямо из WhatsApp. Автоответы, шаблоны, история переписки в едином окне.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-num">03</div>
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">Аналитика в реальном времени</div>
-      <p class="feature-desc">Дашборды продаж, воронки, прогнозы. Excel и PDF экспорт одной кнопкой для отчётности.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-num">04</div>
-      <div class="feature-icon">🏢</div>
-      <div class="feature-title">Мультитенантность</div>
-      <p class="feature-desc">Управляй несколькими компаниями или филиалами из единого аккаунта с изолированными данными.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-num">05</div>
-      <div class="feature-icon">🔗</div>
-      <div class="feature-title">Интеграции</div>
-      <p class="feature-desc">1С, Telegram, PayBox, Mobizon SMS, Google Calendar. Подключай нужные сервисы без программистов.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-num">06</div>
-      <div class="feature-icon">🔒</div>
-      <div class="feature-title">Безопасность</div>
-      <p class="feature-desc">2FA аутентификация, ролевой доступ, шифрование данных. Соответствие стандартам безопасности.</p>
-    </div>
+  <div class="s-label">Возможности</div>
+  <h2 class="s-title reveal">Всё что нужно<br>для роста</h2>
+  <p class="s-desc reveal">Единая платформа для производственных и торговых компаний. Никаких лишних инструментов.</p>
+  <div class="feat-grid">
+    <div class="feat-card reveal"><div class="feat-n">01</div><div class="feat-icon">📦</div><div class="feat-title">Управление материалами</div><p class="feat-desc">Полный контроль склада, остатков и поставок. Автоматические уведомления о критических уровнях запасов.</p></div>
+    <div class="feat-card reveal"><div class="feat-n">02</div><div class="feat-icon">💬</div><div class="feat-title">WhatsApp CRM</div><p class="feat-desc">Принимай заявки прямо из WhatsApp. Автоответы, шаблоны, история переписки в едином окне.</p></div>
+    <div class="feat-card reveal"><div class="feat-n">03</div><div class="feat-icon">📊</div><div class="feat-title">Аналитика в реальном времени</div><p class="feat-desc">Дашборды продаж, воронки, прогнозы. Excel и PDF экспорт одной кнопкой.</p></div>
+    <div class="feat-card reveal"><div class="feat-n">04</div><div class="feat-icon">🏢</div><div class="feat-title">Мультитенантность</div><p class="feat-desc">Управляй несколькими компаниями из единого аккаунта с изолированными данными.</p></div>
+    <div class="feat-card reveal"><div class="feat-n">05</div><div class="feat-icon">🔗</div><div class="feat-title">Интеграции</div><p class="feat-desc">1С, Telegram, PayBox, Mobizon SMS, Google Calendar. Без программистов.</p></div>
+    <div class="feat-card reveal"><div class="feat-n">06</div><div class="feat-icon">🔒</div><div class="feat-title">Безопасность</div><p class="feat-desc">2FA, ролевой доступ, шифрование данных. Хранение на серверах в Казахстане.</p></div>
   </div>
 </section>
 
@@ -409,70 +475,41 @@
 
 <!-- HOW IT WORKS -->
 <section id="how">
-  <div class="how-wrap">
+  <div class="how-grid">
     <div>
-      <div class="section-label">Как работает</div>
-      <h2 class="section-title reveal">Запуск за<br><span style="color:var(--accent)">3 шага</span></h2>
+      <div class="s-label">Как работает</div>
+      <h2 class="s-title reveal">Запуск за<br><span style="color:var(--accent)">3 шага</span></h2>
       <div class="steps">
-        <div class="step reveal">
-          <div class="step-num">01</div>
-          <div class="step-content">
-            <div class="step-title">Регистрация компании</div>
-            <p class="step-desc">Создай аккаунт, добавь реквизиты компании и пригласи команду. Занимает 3 минуты.</p>
-          </div>
-        </div>
-        <div class="step reveal">
-          <div class="step-num">02</div>
-          <div class="step-content">
-            <div class="step-title">Подключи WhatsApp</div>
-            <p class="step-desc">Сканируй QR-код через Green API и получай заявки прямо в систему. Без технических знаний.</p>
-          </div>
-        </div>
-        <div class="step reveal">
-          <div class="step-num">03</div>
-          <div class="step-content">
-            <div class="step-title">Начни работать</div>
-            <p class="step-desc">Загрузи каталог материалов, настрой воронку и обрабатывай заказы в едином дашборде.</p>
-          </div>
-        </div>
+        <div class="step reveal"><div class="step-n">01</div><div><div class="step-title">Регистрация компании</div><p class="step-desc">Создай аккаунт, добавь реквизиты и пригласи команду. Занимает 3 минуты.</p></div></div>
+        <div class="step reveal"><div class="step-n">02</div><div><div class="step-title">Подключи WhatsApp</div><p class="step-desc">Сканируй QR-код через Green API и получай заявки прямо в систему.</p></div></div>
+        <div class="step reveal"><div class="step-n">03</div><div><div class="step-title">Начни работать</div><p class="step-desc">Загрузи каталог, настрой воронку и обрабатывай заказы в едином дашборде.</p></div></div>
       </div>
     </div>
-    <div class="reveal">
-      <div class="phone-mock">
-        <div class="phone-notch"></div>
-        <div class="tag" style="margin-bottom:1rem;font-size:0.6rem"><span class="tag-dot"></span>WhatsApp Live</div>
-        <div class="chat-msg">
-          <div>
-            <div class="msg msg-in">Добрый день! Хотим заказать 500 мешков цемента М400</div>
-            <div class="msg-time">09:14</div>
-          </div>
-          <div>
-            <div class="msg msg-out">Здравствуйте! Уточняю наличие...</div>
-            <div class="msg-time">09:15</div>
-          </div>
-          <div>
-            <div class="msg msg-in" style="background:rgba(123,94,167,0.15);border-color:rgba(123,94,167,0.3);color:#c4b0e0">
-              ✅ Заявка #2847 создана автоматически
-            </div>
-            <div class="msg-time">09:15 · AD Pulse</div>
-          </div>
-          <div>
-            <div class="msg msg-out">Есть в наличии 800 мешков. Доставка 2-3 дня. Стоимость: 850 000 ₸</div>
-            <div class="msg-time">09:16</div>
-          </div>
-          <div>
-            <div class="msg msg-in">Отлично, оформляем!</div>
-            <div class="msg-time">09:17</div>
-          </div>
-          <div>
-            <div class="msg msg-in" style="background:rgba(0,245,196,0.08);border-color:rgba(0,245,196,0.3);color:var(--accent)">
-              💰 Сделка закрыта · 850 000 ₸
-            </div>
-            <div class="msg-time">09:17 · AD Pulse</div>
-          </div>
-        </div>
-      </div>
+    <!-- VIDEO DEMO -->
+    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem">
+      <div class="s-label" style="justify-content:center">Демо</div>
+      <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;text-align:center;max-width:320px">Посмотри как работает платформа — 3-минутный тур без регистрации.</p>
+      <button class="video-btn" onclick="openVideo()">
+        <span class="vplay">▶</span>
+        <span>Смотреть демо</span>
+        <span class="vdur">3:24</span>
+      </button>
     </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FOR WHOM -->
+<section id="forwhom">
+  <div class="s-label">Для кого</div>
+  <h2 class="s-title reveal">Создан для<br><span style="color:var(--accent)">производственников</span></h2>
+  <p class="s-desc reveal">AD Pulse понимает специфику реального сектора — сезонность, партии, сложные цепочки поставок.</p>
+  <div class="fw-grid">
+    <div class="fw-card reveal"><div class="fw-emoji">🏗️</div><div class="fw-title">Стройматериалы</div><p class="fw-desc">Цемент, ЖБИ, кирпич, блоки. Контроль партий, отгрузок, дебиторки через WhatsApp.</p><div class="fw-tag">Бетон · Цемент · ЖБИ</div></div>
+    <div class="fw-card reveal"><div class="fw-emoji">⚙️</div><div class="fw-title">Металлоторговля</div><p class="fw-desc">Арматура, трубы, профиль. Учёт тоннажа, резка, остатки на складе в реальном времени.</p><div class="fw-tag">Металл · Прокат</div></div>
+    <div class="fw-card reveal"><div class="fw-emoji">🚛</div><div class="fw-title">Дистрибьюторы</div><p class="fw-desc">Несколько складов, десятки поставщиков — всё в одном окне с аналитикой.</p><div class="fw-tag">Опт · Логистика · B2B</div></div>
+    <div class="fw-card reveal"><div class="fw-emoji">🪵</div><div class="fw-title">Лесная промышленность</div><p class="fw-desc">Пиломатериалы, доска, брус. Учёт кубатуры и сортности в системе.</p><div class="fw-tag">Лес · Пиломатериалы</div></div>
   </div>
 </section>
 
@@ -480,9 +517,9 @@
 
 <!-- INTEGRATIONS -->
 <section id="integrations">
-  <div class="section-label">Интеграции</div>
-  <h2 class="section-title reveal">Подключается<br>ко всему</h2>
-  <div class="integrations reveal">
+  <div class="s-label">Интеграции</div>
+  <h2 class="s-title reveal">Подключается<br>ко всему</h2>
+  <div class="int-wrap reveal">
     <div class="int-chip">WhatsApp (Green API)</div>
     <div class="int-chip">Telegram Bot</div>
     <div class="int-chip">1С Бухгалтерия</div>
@@ -498,303 +535,216 @@
 
 <hr class="divider">
 
-<!-- FOR WHOM -->
-<section id="forwhom">
-  <div class="section-label">Для кого</div>
-  <h2 class="section-title reveal">Создан для<br><span style="color:var(--accent)">производственников</span></h2>
-  <p class="section-desc reveal">AD Pulse понимает специфику реального сектора — сезонность, партии, сложные цепочки поставок.</p>
-  <div class="fw-grid">
-    <div class="fw-card reveal">
-      <div class="fw-icon">🏗️</div>
-      <div class="fw-title">Производители стройматериалов</div>
-      <p class="fw-desc">Цемент, ЖБИ, кирпич, блоки. Контроль партий, отгрузок, дебиторки через WhatsApp.</p>
-      <div class="fw-tag">Бетон · Цемент · ЖБИ</div>
-    </div>
-    <div class="fw-card reveal">
-      <div class="fw-icon">⚙️</div>
-      <div class="fw-title">Металлоторговля</div>
-      <p class="fw-desc">Арматура, трубы, профиль. Учёт тоннажа, резка, остатки на складе в реальном времени.</p>
-      <div class="fw-tag">Металл · Прокат · Трубы</div>
-    </div>
-    <div class="fw-card reveal">
-      <div class="fw-icon">🚛</div>
-      <div class="fw-title">Дистрибьюторы</div>
-      <p class="fw-desc">Многоуровневые цепочки, несколько складов, десятки поставщиков — всё в одном окне.</p>
-      <div class="fw-tag">Опт · Логистика · B2B</div>
-    </div>
-    <div class="fw-card reveal">
-      <div class="fw-icon">🪵</div>
-      <div class="fw-title">Лесная промышленность</div>
-      <p class="fw-desc">Пиломатериалы, доска, брус. Учёт кубатуры, влажности, сортности прямо в системе.</p>
-      <div class="fw-tag">Лес · Пиломатериалы</div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- VIDEO DEMO -->
-<section style="text-align:center;padding:5rem 4rem">
-  <div class="section-label" style="justify-content:center">Демо</div>
-  <h2 class="section-title reveal" style="max-width:600px;margin:0 auto 1.5rem">Посмотри как<br>работает AD Pulse</h2>
-  <p class="section-desc reveal" style="margin:0 auto 2.5rem">3-минутный тур по платформе. Без регистрации.</p>
-  <button class="video-btn reveal" onclick="openVideo()">
-    <span class="video-play">▶</span>
-    <span>Смотреть демо</span>
-    <span class="video-dur">3:24</span>
-  </button>
-</section>
-
-<!-- VIDEO MODAL -->
-<div class="vmodal" id="vmodal" onclick="closeVideo()">
-  <div class="vmodal-inner" onclick="event.stopPropagation()">
-    <button class="vmodal-close" onclick="closeVideo()">✕</button>
-    <div class="vmodal-screen">
-      <div class="vmodal-placeholder">
-        <div class="vmodal-pulse"></div>
-        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:0.5rem">AD Pulse Demo</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted)">Видео скоро появится · Coming soon</div>
-        <a href="https://wa.me/77071115354" class="btn-primary" style="margin-top:2rem;display:inline-block">Получить живое демо →</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<hr class="divider">
-
 <!-- FAQ -->
 <section id="faq">
-  <div class="section-label">FAQ</div>
-  <h2 class="section-title reveal">Частые вопросы</h2>
+  <div class="s-label">FAQ</div>
+  <h2 class="s-title reveal">Частые вопросы</h2>
   <div class="faq-list">
-    <div class="faq-item reveal">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span>Нужны ли технические знания для подключения?</span>
-        <span class="faq-arrow">+</span>
-      </button>
-      <div class="faq-a">Нет. Подключение WhatsApp — это сканирование QR-кода. Остальные настройки делаются через визуальный интерфейс. Если возникнут вопросы — мы помогаем лично.</div>
-    </div>
-    <div class="faq-item reveal">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span>Как хранятся данные? Это безопасно?</span>
-        <span class="faq-arrow">+</span>
-      </button>
-      <div class="faq-a">Данные хранятся на серверах в Казахстане, зашифрованы AES-256. Доступ по ролям, 2FA аутентификация, полный аудит действий. Возможно On-premise развёртывание на ваших серверах.</div>
-    </div>
-    <div class="faq-item reveal">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span>Можно ли работать с нескольких компаний?</span>
-        <span class="faq-arrow">+</span>
-      </button>
-      <div class="faq-a">Да. Мультитенантная архитектура позволяет управлять несколькими юридическими лицами из одного аккаунта с полной изоляцией данных между ними.</div>
-    </div>
-    <div class="faq-item reveal">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span>Есть ли интеграция с 1С?</span>
-        <span class="faq-arrow">+</span>
-      </button>
-      <div class="faq-a">Да, полная двусторонняя синхронизация с 1С:Бухгалтерия и 1С:Торговля. Данные синхронизируются автоматически по расписанию или в реальном времени.</div>
-    </div>
-    <div class="faq-item reveal">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span>Сколько стоит? Есть ли бесплатный период?</span>
-        <span class="faq-arrow">+</span>
-      </button>
-      <div class="faq-a">Стоимость рассчитывается индивидуально под задачи вашего бизнеса. Пишите нам в WhatsApp — покажем демо и обсудим условия. Первые 14 дней бесплатно.</div>
-    </div>
+    <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>Нужны ли технические знания?</span><span class="faq-arrow">+</span></button><div class="faq-a">Нет. Подключение WhatsApp — это сканирование QR-кода. Остальные настройки через визуальный интерфейс. Если возникнут вопросы — помогаем лично.</div></div>
+    <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>Как хранятся данные?</span><span class="faq-arrow">+</span></button><div class="faq-a">Данные хранятся на серверах в Казахстане, зашифрованы AES-256. Доступ по ролям, 2FA, полный аудит действий. Возможно On-premise развёртывание.</div></div>
+    <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>Можно управлять несколькими компаниями?</span><span class="faq-arrow">+</span></button><div class="faq-a">Да. Мультитенантная архитектура позволяет управлять несколькими юридическими лицами из одного аккаунта с полной изоляцией данных.</div></div>
+    <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>Есть ли интеграция с 1С?</span><span class="faq-arrow">+</span></button><div class="faq-a">Да, полная двусторонняя синхронизация с 1С:Бухгалтерия и 1С:Торговля. Данные синхронизируются автоматически по расписанию или в реальном времени.</div></div>
+    <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>Сколько стоит?</span><span class="faq-arrow">+</span></button><div class="faq-a">Стоимость рассчитывается индивидуально. Пишите в WhatsApp — покажем демо и обсудим условия. Первые 14 дней бесплатно.</div></div>
   </div>
 </section>
 
 <hr class="divider">
 
 <!-- CTA -->
-<section class="cta-section" id="contact">
-  <div class="cta-bg"></div>
-  <div class="tag" style="margin:0 auto 2rem;display:inline-flex"><span class="tag-dot"></span>Готовы начать?</div>
-  <h2 class="section-title reveal">Запусти AD Pulse<br>сегодня</h2>
-  <p class="section-desc reveal" style="margin:0 auto 3rem">
-    Оставь заявку и мы свяжемся в течение 1 часа. Покажем живое демо на твоих данных. Без обязательств.
-  </p>
+<section class="cta-sec" id="contact">
+  <div class="cta-glow"></div>
+  <div style="display:inline-flex;align-items:center;gap:0.6rem;border:1px solid rgba(0,245,196,0.25);padding:0.35rem 0.9rem;background:rgba(0,245,196,0.04);margin-bottom:2rem;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent)"><span class="hero-badge-dot"></span>Готовы начать?</div>
+  <h2 class="s-title reveal">Запусти AD Pulse<br>сегодня</h2>
+  <p class="s-desc reveal" style="margin:0 auto 3rem">Оставь заявку и мы свяжемся в течение 1 часа. Покажем живое демо на твоих данных. Без обязательств.</p>
   <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1" class="reveal">
-    <a href="https://wa.me/77071115354" class="btn-primary" style="font-size:1rem">Написать в WhatsApp →</a>
-    <a href="contact.html" class="btn-ghost" style="border:1px solid var(--border);padding:1rem 2rem;font-size:0.85rem">Форма заявки</a>
+    <a href="https://wa.me/77071115354" class="btn-p" style="font-size:0.95rem">Написать в WhatsApp →</a>
+    <a href="mailto:hello@altaidynamics.kz" class="btn-g" style="border:1px solid var(--border);padding:0.9rem 1.8rem">Email нам</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-top">
-    <div class="footer-logo">AD Pulse · Altai Dynamics</div>
-    <ul class="footer-links">
+  <div class="ft-top">
+    <div class="ft-logo">AD Pulse · Altai Dynamics</div>
+    <ul class="ft-links">
       <li><a href="#features">Продукт</a></li>
       <li><a href="#integrations">Интеграции</a></li>
+      <li><a href="#faq">FAQ</a></li>
       <li><a href="#contact">Контакт</a></li>
     </ul>
   </div>
-  <div class="footer-bottom">
+  <div class="ft-bottom">
     <div>
-      <div class="footer-copy">© 2026 Altai Dynamics. Все права защищены. Астана, Казахстан.</div>
-      <div class="footer-rights" style="margin-top:0.5rem">
-        AD Pulse и Altai Dynamics являются зарегистрированными товарными знаками. Платформа, дизайн, исходный код и все материалы защищены авторским правом. Несанкционированное копирование и использование запрещено.
-      </div>
+      <div class="ft-copy">© 2026 Altai Dynamics. Все права защищены. Астана, Казахстан.</div>
+      <div class="ft-rights" style="margin-top:0.4rem">AD Pulse и Altai Dynamics являются зарегистрированными товарными знаками. Платформа, дизайн и исходный код защищены авторским правом.</div>
     </div>
-    <div class="footer-hub">
-      <div class="hub-label">Резидент</div>
-      <img src="https://cdn.astanahub.com/static/img_v2/logo.svg" alt="Astana Hub" class="hub-logo">
+    <div class="ft-hub">
+      <div class="hub-lbl">Резидент</div>
+      <img src="https://cdn.astanahub.com/static/img_v2/logo.svg" alt="Astana Hub" class="hub-img">
     </div>
   </div>
 </footer>
 
-<!-- FLOATING WHATSAPP -->
+<!-- VIDEO MODAL -->
+<div class="vmodal" id="vmodal" onclick="closeVideo()">
+  <div class="vmodal-inner" onclick="event.stopPropagation()">
+    <button class="vmodal-close" onclick="closeVideo()">✕ закрыть</button>
+    <div class="vmodal-screen">
+      <div class="vmodal-pulse"></div>
+      <div class="vmodal-content">
+        <h3>AD Pulse Demo</h3>
+        <p>Видео скоро появится. Пока можешь получить живое демо.</p>
+        <a href="https://wa.me/77071115354" class="btn-p" target="_blank">Получить живое демо →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING WA -->
 <a href="https://wa.me/77071115354" class="wa-float" target="_blank" aria-label="WhatsApp">
-  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
 <script>
-// DETECT TOUCH — no cursor on mobile
+// TOUCH DETECT
 const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
 
-// CURSOR (desktop only)
-const cursor=document.getElementById('cursor');
-const trail=document.getElementById('cursor-trail');
-let mx=window.innerWidth/2,my=window.innerHeight/2,tx=mx,ty=my;
+// CURSOR
+const cursor=document.getElementById('cursor'),trail=document.getElementById('cursor-trail');
+let mx=0,my=0,tx=0,ty=0;
 if(!isTouch){
   document.addEventListener('mousemove',e=>{
     mx=e.clientX;my=e.clientY;
     cursor.style.left=mx+'px';cursor.style.top=my+'px';
     cursor.style.opacity='1';trail.style.opacity='1';
   });
-  (function animTrail(){
-    tx+=(mx-tx)*0.25;ty+=(my-ty)*0.25;
-    trail.style.left=Math.round(tx)+'px';
-    trail.style.top=Math.round(ty)+'px';
-    requestAnimationFrame(animTrail);
-  })();
-  document.querySelectorAll('a,button,.feature-card,.step,.int-chip,.wa-float').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2)';cursor.style.background='#7b5ea7'});
+  (function at(){tx+=(mx-tx)*0.28;ty+=(my-ty)*0.28;trail.style.left=Math.round(tx)+'px';trail.style.top=Math.round(ty)+'px';requestAnimationFrame(at)})();
+  document.querySelectorAll('a,button,.feat-card,.step,.fw-card,.int-chip,.wa-float,.faq-q').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2.5)';cursor.style.background='#7b5ea7'});
     el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';cursor.style.background='var(--accent)'});
   });
 }
 
-// CANVAS PARTICLES — mouse repel
-const canvas=document.getElementById('bg-canvas');
-const ctx=canvas.getContext('2d');
-let W,H,particles=[];
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
-resize();window.addEventListener('resize',resize);
-class Particle{
-  constructor(){this.reset()}
-  reset(){
-    this.x=Math.random()*W;this.y=Math.random()*H;
-    this.ox=this.x;this.oy=this.y;
-    this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;
-    this.size=Math.random()*1.5+0.5;
-    this.opacity=Math.random()*0.5+0.08;
-    this.color=Math.random()>0.7?'0,245,196':'123,94,167';
+// CANVAS
+const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function rs(){W=canvas.width=innerWidth;H=canvas.height=innerHeight}
+rs();addEventListener('resize',rs);
+class P{
+  constructor(){this.r()}
+  r(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.s=Math.random()*1.4+.4;this.o=Math.random()*.45+.06;this.c=Math.random()>.72?'0,245,196':'123,94,167'}
+  u(){
+    if(!isTouch){const dx=this.x-mx,dy=this.y-my,d=Math.sqrt(dx*dx+dy*dy);if(d<130){const f=(130-d)/130;this.vx+=dx/d*f*.7;this.vy+=dy/d*f*.7}}
+    this.vx*=0.97;this.vy*=0.97;this.x+=this.vx;this.y+=this.vy;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.r();
   }
-  update(){
-    // mouse repel
-    const dx=this.x-mx,dy=this.y-my,dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<120&&!isTouch){
-      const force=(120-dist)/120;
-      this.vx+=dx/dist*force*0.8;
-      this.vy+=dy/dist*force*0.8;
-    }
-    // dampen velocity
-    this.vx*=0.97;this.vy*=0.97;
-    this.x+=this.vx;this.y+=this.vy;
-    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
-  }
-  draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(${this.color},${this.opacity})`;ctx.fill()}
+  d(){ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fillStyle=`rgba(${this.c},${this.o})`;ctx.fill()}
 }
-for(let i=0;i<140;i++)particles.push(new Particle());
-function drawConnections(){
-  for(let i=0;i<particles.length;i++){
-    for(let j=i+1;j<particles.length;j++){
-      const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<110){ctx.beginPath();ctx.strokeStyle=`rgba(0,245,196,${0.05*(1-dist/110)})`;ctx.lineWidth=0.5;ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.stroke()}
-    }
-  }
-}
-function animCanvas(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw()});drawConnections();requestAnimationFrame(animCanvas)}
-animCanvas();
+for(let i=0;i<130;i++)pts.push(new P());
+function dc(){for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<105){ctx.beginPath();ctx.strokeStyle=`rgba(0,245,196,${0.045*(1-d/105)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}}
+(function a(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.u();p.d()});dc();requestAnimationFrame(a)})();
 
-// SCROLL REVEAL
-const io=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*80)})},{threshold:0.1});
+// REVEAL
+const io=new IntersectionObserver(es=>{es.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*70)})},{threshold:0.08});
 document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
 
 // COUNT UP
-function countUp(){
-  document.querySelectorAll('.count-up').forEach(el=>{
-    const target=+el.dataset.target;let curr=0;const step=target/60;
-    const timer=setInterval(()=>{curr+=step;if(curr>=target){curr=target;clearInterval(timer)}el.textContent=Math.floor(curr)},16);
-  });
-}
-new IntersectionObserver(entries=>{if(entries[0].isIntersecting)countUp()},{threshold:0.5}).observe(document.querySelector('.hero'));
+function countUp(){document.querySelectorAll('.count-up').forEach(el=>{const t=+el.dataset.target;let c=0;const s=t/60;const tm=setInterval(()=>{c+=s;if(c>=t){c=t;clearInterval(tm)}el.textContent=Math.floor(c)},16)})}
+new IntersectionObserver(es=>{if(es[0].isIntersecting)countUp()},{threshold:0.5}).observe(document.querySelector('.hero'));
 
-// NAV SCROLL
+// NAV
 window.addEventListener('scroll',()=>{
-  document.getElementById('navbar').style.background=window.scrollY>50?'rgba(10,10,15,0.95)':'rgba(10,10,15,0.7)';
-});
+  document.getElementById('navbar').style.background=scrollY>50?'rgba(6,6,9,0.92)':'rgba(6,6,9,0.6)';
+},{passive:true});
+
+// PARALLAX
+window.addEventListener('scroll',()=>{
+  const sy=scrollY;
+  const ht=document.querySelector('.hero-title');
+  const hs=document.querySelector('.hero-sub');
+  if(ht)ht.style.transform=`translateY(${sy*.2}px)`;
+  if(hs)hs.style.transform=`translateY(${sy*.12}px)`;
+},{passive:true});
 
 // MOBILE MENU
 function toggleMenu(){document.getElementById('mobile-nav').classList.toggle('open')}
 
-// FAQ
-function toggleFaq(btn){
-  const item=btn.closest('.faq-item');
-  const isOpen=item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!isOpen)item.classList.add('open');
-}
-
-// VIDEO MODAL
-function openVideo(){document.getElementById('vmodal').classList.add('open');document.body.style.overflow='hidden'}
-function closeVideo(){document.getElementById('vmodal').classList.remove('open');document.body.style.overflow=''}
-
-// TYPED EFFECT
+// TYPED
 (function(){
   const el=document.getElementById('typed-target');
   if(!el)return;
   const words=['умнее','быстрее','точнее','проще'];
-  let wi=0,ci=0,deleting=false;
-  function type(){
-    const word=words[wi];
-    if(!deleting){
-      el.textContent=word.slice(0,++ci);
-      if(ci===word.length){deleting=true;setTimeout(type,1800);return}
-    } else {
-      el.textContent=word.slice(0,--ci);
-      if(ci===0){deleting=false;wi=(wi+1)%words.length;setTimeout(type,400);return}
-    }
-    setTimeout(type,deleting?60:110);
+  let wi=0,ci=0,del=false;
+  function t(){
+    const w=words[wi];
+    if(!del){el.textContent=w.slice(0,++ci);if(ci===w.length){del=true;setTimeout(t,1800);return}}
+    else{el.textContent=w.slice(0,--ci);if(ci===0){del=false;wi=(wi+1)%words.length;setTimeout(t,350);return}}
+    setTimeout(t,del?55:105);
   }
-  setTimeout(type,1200);
+  setTimeout(t,1200);
 })();
 
-// GLITCH LOGO
+// GLITCH
 (function(){
   const logo=document.getElementById('nav-logo');
   if(!logo)return;
-  function triggerGlitch(){
-    logo.classList.add('glitching');
-    setTimeout(()=>logo.classList.remove('glitching'),400);
-    setTimeout(triggerGlitch,Math.random()*4000+3000);
-  }
-  setTimeout(triggerGlitch,2000);
+  function go(){logo.classList.add('glitching');setTimeout(()=>logo.classList.remove('glitching'),400);setTimeout(go,Math.random()*5000+3000)}
+  setTimeout(go,2500);
 })();
 
-// PARALLAX HERO
-window.addEventListener('scroll',()=>{
-  const hero=document.querySelector('.hero');
-  const heroTitle=document.querySelector('.hero-title');
-  const heroSub=document.querySelector('.hero-sub');
-  const sy=window.scrollY;
-  if(heroTitle)heroTitle.style.transform=`translateY(${sy*0.25}px)`;
-  if(heroSub)heroSub.style.transform=`translateY(${sy*0.15}px)`;
-  if(hero){const orb1=document.querySelector('.orb1');const orb2=document.querySelector('.orb2');if(orb1)orb1.style.transform=`translateY(${sy*0.1}px)`;if(orb2)orb2.style.transform=`translateY(${sy*-0.08}px)`;}
-},{passive:true});
+// FAQ
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item'),open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!open)item.classList.add('open');
+}
 
+// VIDEO
+function openVideo(){document.getElementById('vmodal').classList.add('open');document.body.style.overflow='hidden'}
+function closeVideo(){document.getElementById('vmodal').classList.remove('open');document.body.style.overflow=''}
+
+// PHONE BARS
+(function(){
+  const bars=document.getElementById('bars');
+  if(!bars)return;
+  const vals=[30,55,40,70,85,60,95];
+  vals.forEach((v,i)=>{
+    const b=document.createElement('div');
+    b.className='bar'+(v===95?' hi':'');
+    b.style.height='0px';
+    bars.appendChild(b);
+    setTimeout(()=>{b.style.height=v*0.36+'px'},300+i*80);
+  });
+})();
+
+// LIVE PHONE ANIMATION
+(function(){
+  const msgs=[
+    'Нужен цемент М400, 200 мешков...',
+    'Здравствуйте, есть арматура 12мм?',
+    'Сколько стоит доставка до Алматы?',
+    'Можно счёт на 500 блоков D400?',
+    'Когда будет поставка следующая?'
+  ];
+  let i=0;
+  setInterval(()=>{
+    i=(i+1)%msgs.length;
+    const el=document.getElementById('wa-msg');
+    const te=document.getElementById('wa-time');
+    const nb=document.getElementById('new-badge');
+    const notif=document.getElementById('wa-notify');
+    if(el){
+      notif.style.opacity='0';
+      setTimeout(()=>{
+        el.textContent=msgs[i];
+        te.textContent='только что';
+        notif.style.opacity='1';
+        notif.style.transition='opacity 0.5s';
+        if(nb)nb.textContent=(Math.floor(Math.random()*5)+1)+' новых';
+      },500);
+    }
+  },3500);
+})();
 </script>
 </body>
 </html>
